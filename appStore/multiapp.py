@@ -44,7 +44,7 @@ class MultiApp:
         image = Image.open('appStore/img/giz_sdsn.jpg')
         st.sidebar.image(image)
         app = st.sidebar.radio(
-            'Go To',
+            'Pages',
             self.apps,
             format_func=lambda app: app['title'])
 
