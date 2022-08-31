@@ -9,9 +9,9 @@ st.set_page_config(f'SDSN x GIZ Policy Action Tracking v0.1', layout="wide")
 
 app = MultiApp()
 
-app.add_app("Analyse Policy Document", sdg_analysis.app)
-app.add_app("KeyWord Search", keyword_search.app)
-app.add_app("Check Coherence", coherence.app)
-app.add_app("Info", info.app)
+app.add_app("SDG Analysis", sdg_analysis.app)
+app.add_app("Search", keyword_search.app)
+app.add_app("NDC Coherence", coherence.app)
+app.add_app("About", info.app)
 
 app.run()
