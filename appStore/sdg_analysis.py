@@ -97,10 +97,10 @@ def app():
 
                 keywords = kw_model.extract_keywords(
                 all_text,
-                keyphrase_ngram_range=(1, 2),
+                keyphrase_ngram_range=(1, 3),
                 use_mmr=True,
                 stop_words="english",
-                top_n=15,
+                top_n=10,
                 diversity=0.7,
                 )
 
@@ -144,7 +144,7 @@ def app():
                 # load from disc (github repo) for performance boost
                 @st.cache(allow_output_mutation=True)
                 def load_sdgClassifier():
-                    classifier = pipeline("text-classification", model= "jonas/sdg_classifier_osdg")
+                    classifier = pipeline("text-classification", model= "jonas/roberta-base-finetuned-sdg")
 
                     return classifier
 
@@ -198,7 +198,7 @@ def app():
 
                 with c4:
                     st.pyplot(fig)
-                with c5:
+                with c6:
                     st.table(df) 
                 
                 
