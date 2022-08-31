@@ -199,7 +199,7 @@ def app():
                 with c5:
                     st.pyplot(fig)
                     
-                c7, c8, c9 = st.columns([1, 5, 1])
+                c7, c8, c9 = st.columns([1, 10, 1])
                 with c8:
                     st.table(df) 
                 
