@@ -144,7 +144,7 @@ def app():
                 # load from disc (github repo) for performance boost
                 @st.cache(allow_output_mutation=True)
                 def load_sdgClassifier():
-                    classifier = pipeline("text-classification", model= "jonas/roberta-base-finetuned-sdg")
+                    classifier = pipeline("text-classification", model= "jonas/sdg_classifier_osdg")
 
                     return classifier
 
