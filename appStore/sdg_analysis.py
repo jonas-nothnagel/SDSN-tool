@@ -178,7 +178,7 @@ def app():
 
                 st.markdown("## 🎈 Anything related to SDGs?")
 
-                c4, c5, c6 = st.columns([1, 3, 1])
+                c4, c5, c6 = st.columns([2, 2, 2])
 
                 # Add styling
                 cmGreen = sns.light_palette("green", as_cmap=True)
@@ -199,7 +199,7 @@ def app():
                 with c5:
                     st.pyplot(fig)
                     
-                c7, c8, c9 = st.columns([1, 3, 1])
+                c7, c8, c9 = st.columns([1, 5, 1])
                 with c8:
                     st.table(df) 
                 
