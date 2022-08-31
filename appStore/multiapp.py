@@ -41,7 +41,7 @@ class MultiApp:
 
     def run(self):
         st.sidebar.write(format_func=lambda app: app['title'])
-        image = Image.open('appStore/img/giz_sdsn.jpg')
+        image = Image.open('appStore/img/giz_sdsn_small.jpg')
         st.sidebar.image(image)
         app = st.sidebar.radio(
             'Pages',
