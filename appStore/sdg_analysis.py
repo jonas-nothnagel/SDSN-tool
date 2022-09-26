@@ -13,7 +13,11 @@ from transformers import pipeline
 import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
-import pandas as pd 
+import pandas as pd
+import docx
+from docx.shared import Inches
+from docx.shared import Pt
+from docx.enum.style import WD_STYLE_TYPE 
 
 import tempfile
 import sqlite3
@@ -111,7 +115,11 @@ def app():
                     .sort_values(by="Relevancy", ascending=False)
                     .reset_index(drop=True)
                 )
-
+                df1 = (
+                    DataFrame(keywords, columns=["Keyword/Keyphrase", "Relevancy"])
+                    .sort_values(by="Relevancy", ascending=False)
+                    .reset_index(drop=True)
+                )
                 df.index += 1
 
                 # Add styling
@@ -162,12 +170,13 @@ def app():
                     
                 labels = classifier(par_list)
                 labels_= [(l['label'],l['score']) for l in labels]
-                df = DataFrame(labels_, columns=["SDG", "Relevancy"])
-                df['text'] = par_list      
-                df = df.sort_values(by="Relevancy", ascending=False).reset_index(drop=True)  
-                df.index += 1
-                df =df[df['Relevancy']>.85]
-                x = df['SDG'].value_counts()
+                df2 = DataFrame(labels_, columns=["SDG", "Relevancy"])
+                df2['text'] = par_list      
+                df2 = df2.sort_values(by="Relevancy", ascending=False).reset_index(drop=True)  
+                df2.index += 1
+                df2 =df2[df2['Relevancy']>.85]
+                x = df2['SDG'].value_counts()
+                df3 = df2.copy()
 
                 plt.rcParams['font.size'] = 25
                 colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
@@ -175,7 +184,7 @@ def app():
                 fig, ax = plt.subplots()
                 ax.pie(x, colors=colors, radius=2, center=(4, 4),
                     wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=False,labels =list(x.index))
-
+                fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                 st.markdown("## 🎈 Anything related to SDGs?")
 
                 c4, c5, c6 = st.columns([2, 2, 2])
@@ -183,7 +192,7 @@ def app():
                 # Add styling
                 cmGreen = sns.light_palette("green", as_cmap=True)
                 cmRed = sns.light_palette("red", as_cmap=True)
-                df = df.style.background_gradient(
+                df2 = df2.style.background_gradient(
                     cmap=cmGreen,
                     subset=[
                         "Relevancy",
@@ -194,13 +203,91 @@ def app():
                     "Relevancy": "{:.1%}",
                 }
 
-                df = df.format(format_dictionary)
+                df2 = df2.format(format_dictionary)
 
                 with c5:
                     st.pyplot(fig)
                     
                 c7, c8, c9 = st.columns([1, 10, 1])
                 with c8:
-                    st.table(df) 
+                    st.table(df2) 
+
+                document = docx.Document()
+                document.add_heading('Document name:{}'.format(file_name), 2)
+                # Choosing the top most section of the page
+                section = document.sections[0]
+ 
+                # Calling the footer
+                footer = section.footer
+                
+                # Calling the paragraph already present in
+                # the footer section
+                footer_para = footer.paragraphs[0]
+                
+                font_styles = document.styles
+                font_charstyle = font_styles.add_style('CommentsStyle', WD_STYLE_TYPE.CHARACTER)
+                font_object = font_charstyle.font
+                font_object.size = Pt(7)
+                # Adding the centered zoned footer
+                footer_para.add_run('''\tPowered by GIZ Data and the Sustainable Development Solution Network hosted at Hugging-Face spaces: https://huggingface.co/spaces/ppsingh/streamlit_dev''', style='CommentsStyle')
+                
+                #footer_para.text = "\tPowered by GIZ Data and the Sustainable Development Solution Network\
+                 #                     hosted at Hugging-Face spaces: https://huggingface.co/spaces/ppsingh/streamlit_dev"
+                #footer_para.font.size = docx.shared.Pt(6)                     
+                
+                document.add_heading('What is the document about', level=1)
+                t = document.add_table(df1.shape[0]+1, df1.shape[1])
+                
+
+                # add the header rows.
+                for j in range(df1.shape[-1]):
+                    t.cell(0,j).text = df1.columns[j]
+                    
+
+                # add the rest of the data frame
+                for i in range(df1.shape[0]):
+                    for j in range(df1.shape[-1]):
+                        t.cell(i+1,j).text = str(df1.values[i,j])
+                        
+                        
+                        
+                document.add_heading('Anything Related to SDG', level=1)        
+                document.add_picture('temp.png', width=Inches(3), height=Inches(3)) 
+                t = document.add_table(df3.shape[0]+1, df3.shape[1])
+                
+                widths = [Inches(0.4), Inches(0.4), Inches(4.5)]
+                # add the header rows.
+                for j in range(df3.shape[-1]):
+                    t.cell(0,j).text = df3.columns[j]
+                    t.cell(0,j).width = widths[j]
+
+                # add the rest of the data frame
+                for i in range(df3.shape[0]):
+                    for j in range(df3.shape[-1]):
+                        t.cell(i+1,j).width = widths[j]
+                        t.cell(i+1,j).text = str(df3.values[i,j])
+                        
+                              
+                document.save('demo.docx')
+                
+                #with open('summary.txt', 'w') as f:
+                 #   f.write(df1.to_string())
+                 #   f.write(fig)
+                    #f.write(df2)
+                    # f.write(df3.to_string())
+                    
+                with open("demo.docx", "rb") as file:
+                     btn = st.download_button(
+                     label="Download file",
+                     data=file,
+                     file_name="demo.docx",
+                     mime="txt/docx"
+                       )    
+                #with document st.download_button(
+                 #  label="Download data as docx",
+                  # data=document,
+                   #file_name='test.docx',
+                   #mime='text/docx',
+                    # )    
                 
                 

@@ -5,6 +5,7 @@ import appStore.info as info
 from appStore.multiapp import MultiApp
 import streamlit as st
 
+# This branch is before the download option was implemented
 st.set_page_config(f'SDSN x GIZ Policy Action Tracking v0.1', layout="wide")
 
 app = MultiApp()

@@ -20,6 +20,10 @@ from sklearn.feature_extraction import _stop_words
 import string
 from tqdm.autonotebook import tqdm
 import numpy as np
+import docx
+from docx.shared import Inches
+from docx.shared import Pt
+from docx.enum.style import WD_STYLE_TYPE 
 
 import tempfile
 import sqlite3
@@ -100,8 +104,29 @@ def app():
                 return bm25_hits, hits
 
       def show_results(keywordList):
+        document = docx.Document()
+        document.add_heading('Document name:{}'.format(file_name), 2)
+        section = document.sections[0]
+
+          # Calling the footer
+        footer = section.footer
+        
+        # Calling the paragraph already present in
+        # the footer section
+        footer_para = footer.paragraphs[0]
+        
+        font_styles = document.styles
+        font_charstyle = font_styles.add_style('CommentsStyle', WD_STYLE_TYPE.CHARACTER)
+        font_object = font_charstyle.font
+        font_object.size = Pt(7)
+        # Adding the centered zoned footer
+        footer_para.add_run('''\tPowered by GIZ Data and the Sustainable Development Solution Network hosted at Hugging-Face spaces: https://huggingface.co/spaces/ppsingh/streamlit_dev''', style='CommentsStyle')
+        document.add_heading('Your Seacrhed for {}'.format(keywordList), level=1)
         for keyword in keywordList:
+          
           st.write("Results for Query: {}".format(keyword))
+          para = document.add_paragraph().add_run("Results for Query: {}".format(keyword))
+          para.font.size = Pt(12)
           bm25_hits, hits = search(keyword)     
 
           st.markdown("""
@@ -109,24 +134,36 @@ def app():
                       """)  
           # In the semantic search part we provide two kind of results one with only Retriever (Bi-Encoder) and other the ReRanker (Cross Encoder)           
           st.markdown("Top few lexical search (BM25) hits")
+          document.add_paragraph("Top few lexical search (BM25) hits")
+
           for hit in bm25_hits[0:5]:
               if hit['score'] > 0.00:   
                   st.write("\t Score: {:.3f}:  \t{}".format(hit['score'], paraList[hit['corpus_id']].replace("\n", " ")))
+                  document.add_paragraph("\t Score: {:.3f}:  \t{}".format(hit['score'], paraList[hit['corpus_id']].replace("\n", " ")))
           
-          
-        
         
         
         #   st.table(bm25_hits[0:3])
           
           st.markdown("\n-------------------------\n")
           st.markdown("Top few Bi-Encoder Retrieval hits")
-          
+          document.add_paragraph("\n-------------------------\n")
+          document.add_paragraph("Top few Bi-Encoder Retrieval hits")
+
           hits = sorted(hits, key=lambda x: x['score'], reverse=True)
           for hit in hits[0:5]:
             #  if hit['score'] > 0.45:
               st.write("\t Score: {:.3f}:  \t{}".format(hit['score'], paraList[hit['corpus_id']].replace("\n", " ")))
+              document.add_paragraph("\t Score: {:.3f}:  \t{}".format(hit['score'], paraList[hit['corpus_id']].replace("\n", " ")))
           #st.table(hits[0:3]
+        document.save('demo.docx')
+        with open("demo.docx", "rb") as file:
+                     btn = st.download_button(
+                     label="Download file",
+                     data=file,
+                     file_name="demo.docx",
+                     mime="txt/docx"
+                       )  
 
 
       @st.cache(allow_output_mutation=True)
@@ -206,6 +243,7 @@ def app():
           if st.button("Find them."):
             keywordList = [keyword]
           if keywordList is not None:
+
               show_results(keywordList)
           
 

@@ -28,6 +28,11 @@ import sqlite3
 import json
 import urllib.request
 import ast
+import docx
+from docx.shared import Inches
+from docx.shared import Pt
+from docx.enum.style import WD_STYLE_TYPE 
+
 def app():
     # Sidebar
     st.sidebar.title('Check Coherence')
@@ -222,10 +227,41 @@ def app():
                     #label_indices, paragraph_indices = np.where(similarity_matrix>similarity_high_threshold)
 
                     #positive_indices = list(zip(label_indices.tolist(), paragraph_indices.tolist()))
-            
+                    document = docx.Document()
+                    document.add_heading('Document name:{}'.format(file_name), 2)
+                    section = document.sections[0]
+
+                      # Calling the footer
+                    footer = section.footer
+                    
+                    # Calling the paragraph already present in
+                    # the footer section
+                    footer_para = footer.paragraphs[0]
+                    
+                    font_styles = document.styles
+                    font_charstyle = font_styles.add_style('CommentsStyle', WD_STYLE_TYPE.CHARACTER)
+                    font_object = font_charstyle.font
+                    font_object.size = Pt(7)
+                    # Adding the centered zoned footer
+                    footer_para.add_run('''\tPowered by GIZ Data and the Sustainable Development Solution Network hosted at Hugging-Face spaces:                        https://huggingface.co/spaces/ppsingh/streamlit_dev''', style='CommentsStyle')
+                    
+                    document.add_paragraph("Country Code for which NDC is carried out {}".format(countryCode))
+                    
                     for _label_idx, _paragraph_idx in positive_indices:
                         st.write("This paragraph: \n")
+                        document.add_paragraph("This paragraph: \n")
                         st.write(paraList[_paragraph_idx])
                         st.write(f"Is relevant to: \n {list(sent_dict.keys())[_label_idx]}")
+                        document.add_paragraph(f"Is relevant to: \n {list(sent_dict.keys())[_label_idx]}")
                         st.write('-'*10)
+                        document.add_paragraph('-'*10)
+                    
+                    document.save('demo.docx')
+                    with open("demo.docx", "rb") as file:
+                                btn = st.download_button(
+                                label="Download file",
+                                data=file,
+                                file_name="demo.docx",
+                                mime="txt/docx"
+                                  )  
             
