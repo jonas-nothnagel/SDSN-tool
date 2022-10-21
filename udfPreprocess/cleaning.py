@@ -1,4 +1,3 @@
-import logging
 import pandas as pd
 import numpy as np
 import string  
@@ -11,7 +10,7 @@ import streamlit as st
 from haystack.nodes import PreProcessor
 
 '''basic cleaning - suitable for transformer models'''
-def basic(s,SDG = False):
+def basic(s):
     """
     :param s: string to be processed
     :return: processed string: see comments in the source code for more info
@@ -24,15 +23,6 @@ def basic(s,SDG = False):
     # Remove URLs
     s = re.sub(r'^https?:\/\/.*[\r\n]*', ' ', s, flags=re.MULTILINE)
     s = re.sub(r"http\S+", " ", s)
-    if SDG == True:
-        s = s.lower()
-        translator = str.maketrans(' ', ' ', string.punctuation)  
-        s = s.translate(translator)
-        s = re.sub('\n', ' ', s)
-        s = re.sub("\'", " ", s)
-        s = re.sub(r'\d+', ' ', s)
-        s = re.sub(r'\W+', ' ', s) 
-
     # Remove new line characters
     #s = re.sub('\n', ' ', s) 
   
@@ -69,10 +59,9 @@ def preprocessingForSDG(document):
     for i in document:
         docs_processed = preprocessor.process([i])
         for item in docs_processed:
-            item.content = basic(item.content, SDG = True)
+            item.content = basic(item.content)
 
-    with st.spinner("👑 document being splitted into paragraphs"):
-        logging.info("document has been splitted to {} paragraphs".format(len(docs_processed)))
+    st.write("your document has been splitted to", len(docs_processed), "paragraphs")
     
     # create dataframe of text and list of all text
     df = pd.DataFrame(docs_processed)
@@ -104,8 +93,7 @@ def preprocessing(document):
         for item in docs_processed:
             item.content = basic(item.content)
 
-    with st.spinner("👑 document being splitted into paragraphs"):
-        logging.info("document has been splitted to {} paragraphs".format(len(docs_processed)))
+    st.write("your document has been splitted to", len(docs_processed), "paragraphs")
     
     # create dataframe of text and list of all text
     df = pd.DataFrame(docs_processed)
