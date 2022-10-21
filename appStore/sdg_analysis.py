@@ -113,7 +113,7 @@ def app():
                     
                 c7, c8, c9 = st.columns([1, 10, 1])
                 with c8:
-                    st.table(df)
+                    st.dataframe(df)
 
 
 #     1. Keyword heatmap \n
