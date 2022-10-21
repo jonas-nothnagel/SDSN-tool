@@ -125,9 +125,11 @@ def app():
                                         # st.write("\t Score: {:.3f}:  \t{}".format(hit['score'], paraList[hit['corpus_id']].replace("\n", " ")))
                                         st.write("\t {}: {}\t".format(counter, paraList[hit['corpus_id']].replace("\n", " ")))
                                         
-                                st.markdown("---")
+                                
                                 if counter == 0:
                                     st.write("No results found for '**{}**' ".format(keyword))
+                                
+                                st.markdown("---")
                     else:
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
@@ -135,9 +137,9 @@ def app():
                             config = configparser.ConfigParser()
                             config.read_file(open('udfPreprocess/paramconfig.cfg'))
                             threshold = float(config.get('semantic_search','THRESHOLD'))
-                            st.write(query)                          
+                            # st.write(query)                          
                             semantic_hits = semantic_search(query,paraList)
-                            st.markdown("##### Semantic search hits for {} related topics #####".format(queryList))
+                            st.markdown("##### Few Semantic search hits for {} related topics #####".format(queryList))
 
                             for i,queryhit in enumerate(semantic_hits):
 
