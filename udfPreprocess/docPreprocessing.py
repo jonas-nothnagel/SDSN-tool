@@ -65,11 +65,11 @@ def load_document(
     This can happen whith certain pdf types.'''
     for i in documents: 
         if i.content == "":
-            st.write("using pdfplumber")
-            text = []
-            with pdfplumber.open(file_path) as pdf:
-                for page in pdf.pages:
-                    text.append(page.extract_text())
-            i.content = ' '.join([page for page in text])
+            with st.spinner("using pdfplumber"):
+                text = []
+                with pdfplumber.open(file_path) as pdf:
+                    for page in pdf.pages:
+                        text.append(page.extract_text())
+                i.content = ' '.join([page for page in text])
     
     return documents
