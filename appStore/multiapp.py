@@ -2,6 +2,8 @@
 """
 import streamlit as st
 from PIL import Image
+from streamlit_option_menu import option_menu
+from udfPreprocess.uploadAndExample import add_upload
 
 class MultiApp:
     """Framework for combining multiple streamlit applications.
@@ -25,7 +27,7 @@ class MultiApp:
     def __init__(self):
         self.apps = []
 
-    def add_app(self, title, func):
+    def add_app(self,title,icon, func):
         """Adds a new application.
         Parameters
         ----------
@@ -36,16 +38,39 @@ class MultiApp:
         """
         self.apps.append({
             "title": title,
+            "icon": icon,
             "function": func
         })
 
     def run(self):
+        
         st.sidebar.write(format_func=lambda app: app['title'])
-        image = Image.open('appStore/img/giz_sdsn_small.jpg')
+        image = Image.open('appStore/img/giz_sdsn.jpg')
         st.sidebar.image(image)
-        app = st.sidebar.radio(
-            'Pages',
-            self.apps,
-            format_func=lambda app: app['title'])
-
-        app['function']()
+        #st.sidebar.markdown("##  📌 Pages ")
+        #app = st.sidebar.radio(
+        #    'Pages',
+         #   self.apps,
+         #   from streamlit_option_menu import option_menu
+        with st.sidebar:
+            selected = option_menu(None, [page["title"] for page in self.apps],
+                                   icons=[page["icon"] for page in self.apps],
+                                   menu_icon="cast", default_index=0)          
+        
+        
+        for index, item in enumerate(self.apps):
+            if item["title"] == selected:
+                self.apps[index]["function"]()
+                break
+                
+        # app['function']()
+        choice = st.sidebar.radio(label = 'Select the Document',
+                            help = 'You can upload the document \
+                            or else you can try a example document', 
+                            options = ('Upload Document', 'Try Example'), 
+                            horizontal = True)
+        add_upload(choice)
+        # st.sidebar.markdown('')
+        # st.sidebar.markdown(" :cloud: Upload document ")
+        # uploaded_file = st.sidebar.file_uploader('', type=['pdf', 'docx', 'txt']) #Upload PDF File
+        # st.session_state['file'] = uploaded_file
