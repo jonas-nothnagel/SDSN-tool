@@ -58,7 +58,7 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     labels_= [(l.meta['classification']['label'],
                l.meta['classification']['score'],l.content,) for l in results]
 
-    df = DataFrame(labels_, columns=["text","SDG","Relevancy"])
+    df = DataFrame(labels_, columns=["SDG","Relevancy","text"])
 
     # df['text'] = paraList      
     df = df.sort_values(by="Relevancy", ascending=False).reset_index(drop=True)  
