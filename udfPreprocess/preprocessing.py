@@ -252,7 +252,7 @@ def processingpipeline():
     customPreprocessor = UdfPreProcessor()
 
     preprocessing_pipeline.add_node(component=fileconverter, name="FileConverter", inputs=["File"])
-    preprocessing_pipeline.add_node(component = customPreprocessor, name ='UdfPreprocessor', inputs=["FileConverter"])
+    preprocessing_pipeline.add_node(component = customPreprocessor, name ='UdfPreProcessor', inputs=["FileConverter"])
 
     return preprocessing_pipeline
 
