@@ -40,7 +40,7 @@ def add_upload(choice):
             # with open('sample/Ethiopia_s_2021_10 Year Development Plan.txt') as dfile:
             file_name = file_path =  'sample/Ethiopia_s_2021_10 Year Development Plan.txt'
             st.session_state['filename'] = file_name
-            st.sesion_state['filepath'] = file_path
+            st.session_state['filepath'] = file_path
             # st.write("Selected document:", file_name.split('/')[1])
           
           # if option is not None:
