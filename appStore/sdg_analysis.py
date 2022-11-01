@@ -40,9 +40,7 @@ def app():
         st.markdown("")
 
 
-    with st.container():
-        
-
+    with st.container():       
             
         if 'filepath' in st.session_state:
             paraList = runSDGPreprocessingPipeline()
@@ -55,7 +53,8 @@ def app():
                 # plot
                 fig, ax = plt.subplots()
                 ax.pie(x, colors=colors, radius=2, center=(4, 4),
-                    wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=False,labels =list(x.index))
+                    wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
+                    frame=False,labels =list(x.index))
                 # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                 st.markdown("#### Anything related to SDGs? ####")
 
