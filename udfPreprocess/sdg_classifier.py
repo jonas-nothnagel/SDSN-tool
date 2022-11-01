@@ -1,5 +1,6 @@
 from tkinter import Text
 from haystack.nodes import TransformersDocumentClassifier
+from haystack.schema import Document
 from typing import List, Tuple
 import configparser
 import streamlit as st
@@ -27,7 +28,7 @@ def load_sdgClassifier():
     return doc_classifier
 
 
-def sdg_classification(paraList:List[Text])->Tuple[DataFrame,Series]:
+def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
     most appropriate label for each text. these labels are in terms of if text 
@@ -35,9 +36,9 @@ def sdg_classification(paraList:List[Text])->Tuple[DataFrame,Series]:
 
     Params
     ---------
-    paraList: List of paragrpahs/text. The output of Preprocessing Pipeline 
-    contains this list of paragraphs in different format, the simple List format
-    is being used here.
+    haystackdoc: List of haystack Documents. The output of Preprocessing Pipeline 
+    contains the list of paragraphs in different format,here the list of 
+    Haystack Documents is used.
 
     Returns
     ----------
@@ -51,7 +52,7 @@ def sdg_classification(paraList:List[Text])->Tuple[DataFrame,Series]:
 
 
     classifier = load_sdgClassifier()
-    results = classifier.predict(paraList)
+    results = classifier.predict(haystackdoc)
 
     
     labels_= [(l.meta['classification']['label'],
@@ -89,4 +90,4 @@ def runSDGPreprocessingPipeline()->List[Text]:
                                             "split_by": split_by, \
                                             "split_length":split_length}})
     
-    return output_sdg_pre['paraList']
+    return output_sdg_pre['documents']
