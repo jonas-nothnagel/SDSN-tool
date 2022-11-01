@@ -2,7 +2,7 @@ from haystack.nodes.base import BaseComponent
 from haystack.schema import Document
 from haystack.nodes import PDFToTextOCRConverter, PDFToTextConverter
 from haystack.nodes import TextConverter, DocxToTextConverter, PreProcessor
-from typing import Callable, Dict, List, Optional, Text, Union
+from typing import Callable, Dict, List, Optional, Text, Tuple, Union
 from typing_extensions import Literal
 import pandas as pd
 import logging
@@ -55,7 +55,7 @@ class FileConverter(BaseComponent):
 
     def run(self, file_name: str , file_path: str, encoding: Optional[str]=None,
             id_hash_keys: Optional[List[str]] = None,
-            ) -> tuple[dict,str]:
+            ) -> Tuple[dict,str]:
         """ this is required method to invoke the component in 
             the pipeline implementation. 
             
