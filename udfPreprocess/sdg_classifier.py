@@ -51,12 +51,15 @@ def sdg_classification(paraList:List[Text])->Tuple[DataFrame,Series]:
 
 
     classifier = load_sdgClassifier()
-    labels = classifier(paraList)
-    
-    labels_= [(l['label'],l['score']) for l in labels]
-    df = DataFrame(labels_, columns=["SDG", "Relevancy"])
+    results = classifier.predict(paraList)
 
-    df['text'] = paraList      
+    
+    labels_= [(l.meta['classification']['label'],
+               l.meta['classification']['score'],l.content,) for l in results]
+
+    df = DataFrame(labels_, columns=["text","SDG","Relevancy"])
+
+    # df['text'] = paraList      
     df = df.sort_values(by="Relevancy", ascending=False).reset_index(drop=True)  
     df.index += 1
     df =df[df['Relevancy']>threshold]
