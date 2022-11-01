@@ -3,7 +3,7 @@
 import streamlit as st
 from PIL import Image
 from streamlit_option_menu import option_menu
-from udfPreprocess.uploadAndExample import add_upload
+from utils.uploadAndExample import add_upload
 
 class MultiApp:
     """Framework for combining multiple streamlit applications.
@@ -45,7 +45,7 @@ class MultiApp:
     def run(self):
         
         st.sidebar.write(format_func=lambda app: app['title'])
-        image = Image.open('appStore/img/giz_sdsn.jpg')
+        image = Image.open('docStore/img/giz_sdsn.jpg')
         st.sidebar.image(image)
         #st.sidebar.markdown("##  📌 Pages ")
         #app = st.sidebar.radio(

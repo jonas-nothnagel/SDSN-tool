@@ -5,9 +5,9 @@ import configparser
 import streamlit as st
 from pandas import DataFrame, Series
 import logging
-from udfPreprocess.preprocessing import processingpipeline
+from utils.preprocessing import processingpipeline
 config = configparser.ConfigParser()
-config.read_file(open('udfPreprocess/paramconfig.cfg'))
+config.read_file(open('paramconfig.cfg'))
 
 @st.cache(allow_output_mutation=True)
 def load_sdgClassifier():
@@ -58,13 +58,11 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
                l.meta['classification']['score'],l.content,) for l in results]
 
     df = DataFrame(labels_, columns=["SDG","Relevancy","text"])
-
-    # df['text'] = paraList      
+    
     df = df.sort_values(by="Relevancy", ascending=False).reset_index(drop=True)  
     df.index += 1
     df =df[df['Relevancy']>threshold]
     x = df['SDG'].value_counts()
-    #  df = df.copy()
     df= df.drop(['Relevancy'], axis = 1)
     
 

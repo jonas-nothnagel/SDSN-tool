@@ -31,10 +31,10 @@ def add_upload(choice):
                               ('South Africa:Low Emission strategy', 
                               'Ethiopia: 10 Year Development Plan'))
         if option is 'South Africa:Low Emission strategy':
-            file_name = file_path  = 'sample/South Africa_s Low Emission Development Strategy.txt'
+            file_name = file_path  = 'docStore/sample/South Africa_s Low Emission Development Strategy.txt'
             st.session_state['filename'] = file_name
             st.sesion_state['filepath'] = file_path
         else:
-            file_name = file_path =  'sample/Ethiopia_s_2021_10 Year Development Plan.txt'
+            file_name = file_path =  'docStore/sample/Ethiopia_s_2021_10 Year Development Plan.txt'
             st.session_state['filename'] = file_name
             st.session_state['filepath'] = file_path

@@ -11,14 +11,13 @@ import string
 from haystack.pipelines import Pipeline
 import configparser
 config = configparser.ConfigParser()
-config.read_file(open('udfPreprocess/paramconfig.cfg'))
+config.read_file(open('paramconfig.cfg'))
 top_k = int(config.get('lexical_search','TOP_K'))
 
 def useOCR(file_path: str)-> Text:
     """
     Converts image pdfs into text, Using the Farm-haystack[OCR]
-
-
+    
     Params
     ----------
     file_path: file_path of uploade file, returned by add_upload function in 

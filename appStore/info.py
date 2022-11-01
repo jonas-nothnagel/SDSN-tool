@@ -2,12 +2,7 @@ import streamlit as st
 
 
 def app():
-    # if 'file' in st.session_state:
-    #   file = st.session_state['file']
-    # else:
-    #   st.sidebar.markdown(" :cloud: Upload document ")
-    #   uploaded_file = st.sidebar.file_uploader('', type=['pdf', 'docx', 'txt']) #Upload PDF File
-    #   st.session_state['file'] = uploaded_file
+
     
     with open('style.css') as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -39,7 +34,7 @@ The collaboration aims to determine the potential of NLP methods for tracking po
     <br>
     """
     st.markdown(intro, unsafe_allow_html=True)
-    st.image("appStore/img/pic1.png", caption="NDC Coherence")
+    st.image("docStore/img/pic1.png", caption="NDC Coherence")
     #st.subheader("Methodology")
     #st.write("Each sentence in the generated answer ends with a coloured tooltip; the colour ranges from red to green. "
     #         "The tooltip contains a value representing answer sentence similarity to a specific sentence in the "

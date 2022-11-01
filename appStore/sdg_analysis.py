@@ -1,6 +1,6 @@
 # set path
 import glob, os, sys; 
-sys.path.append('../udfPreprocess')
+sys.path.append('../utils')
 
 #import helper
 
@@ -14,9 +14,8 @@ import docx
 from docx.shared import Inches
 from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
-from udfPreprocess.sdg_classifier import sdg_classification
-from udfPreprocess.sdg_classifier import runSDGPreprocessingPipeline
-import configparser
+from utils.sdg_classifier import sdg_classification
+from utils.sdg_classifier import runSDGPreprocessingPipeline
 import tempfile
 import sqlite3
 import logging
@@ -35,7 +34,10 @@ def app():
 
         st.write(
             """     
-            The *Analyse Policy Document* app is an easy-to-use interface built in Streamlit for analyzing policy documents with respect to SDG Classification for the paragraphs/texts in the document - developed by GIZ Data and the Sustainable Development Solution Network. \n
+            The *Analyse Policy Document* app is an easy-to-use interface built \
+                in Streamlit for analyzing policy documents with respect to SDG \
+                 Classification for the paragraphs/texts in the document - \
+                developed by GIZ Data and the Sustainable Development Solution Network. \n
             """)
         st.markdown("")
 
