@@ -27,7 +27,7 @@ def load_sdgClassifier():
     return doc_classifier
 
 
-def sdg_classification(paraList:List[Text])->Tuple(DataFrame,Series):
+def sdg_classification(paraList:List[Text])->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
     most appropriate label for each text. these labels are in terms of if text 
