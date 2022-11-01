@@ -50,6 +50,19 @@ def app():
 
                 df, x = sdg_classification(paraList)
 
+
+                # classifier = load_sdgClassifier()
+
+                # labels = classifier(par_list)
+                # labels_= [(l['label'],l['score']) for l in labels]
+                # df2 = DataFrame(labels_, columns=["SDG", "Relevancy"])
+                # df2['text'] = par_list      
+                # df2 = df2.sort_values(by="Relevancy", ascending=False).reset_index(drop=True)  
+                # df2.index += 1
+                # df2 =df2[df2['Relevancy']>.85]
+                # x = df2['SDG'].value_counts()
+                # df3 = df2.copy()
+
                 plt.rcParams['font.size'] = 25
                 colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
                 # plot
@@ -59,7 +72,25 @@ def app():
                 # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                 st.markdown("#### Anything related to SDGs? ####")
 
+                # st.markdown("#### 🎈 Anything related to SDGs? ####")
+
                 c4, c5, c6 = st.columns([2, 2, 2])
+
+                # Add styling
+                cmGreen = sns.light_palette("green", as_cmap=True)
+                cmRed = sns.light_palette("red", as_cmap=True)
+                # df2 = df2.style.background_gradient(
+                #     cmap=cmGreen,
+                #     subset=[
+                #         "Relevancy",
+                #     ],
+                # )
+
+                # format_dictionary = {
+                #     "Relevancy": "{:.1%}",
+                # }
+
+                # df2 = df2.format(format_dictionary)
 
                 with c5:
                     st.pyplot(fig)

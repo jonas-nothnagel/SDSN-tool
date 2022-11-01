@@ -1,4 +1,3 @@
-from tkinter import Text
 from haystack.nodes import TransformersDocumentClassifier
 from haystack.schema import Document
 from typing import List, Tuple
@@ -71,11 +70,18 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
 
     return df, x
 
-def runSDGPreprocessingPipeline()->List[Text]:
+def runSDGPreprocessingPipeline()->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
     
+    Return
+    --------------
+    List[Document]: When preprocessing pipeline is run, the output dictionary 
+    has four objects. For the Haysatck implementation of SDG classification we, 
+    need to use the List of Haystack Document, which can be fetched by 
+    key = 'documents' on output.
+
     """
     file_path = st.session_state['filepath']
     file_name = st.session_state['filename']
