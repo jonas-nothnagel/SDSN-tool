@@ -19,8 +19,9 @@ import docx
 from docx.shared import Inches
 from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
-from udfPreprocess.sdg import sdg_classification
-
+from udfPreprocess.sdg_classifier import sdg_classification
+from udfPreprocess.sdg_classifier import runSDGPreprocessingPipeline
+import configparser
 import tempfile
 import sqlite3
 import logging
@@ -28,14 +29,14 @@ logger = logging.getLogger(__name__)
 
 
 
-@st.cache(allow_output_mutation=True)
-def load_keyBert():
-    return KeyBERT()
+# @st.cache(allow_output_mutation=True)
+# def load_keyBert():
+#     return KeyBERT()
 
-@st.cache(allow_output_mutation=True)
-def load_sdgClassifier():
-    classifier = pipeline("text-classification", model= "jonas/sdg_classifier_osdg")
-    return classifier
+# @st.cache(allow_output_mutation=True)
+# def load_sdgClassifier():
+#     classifier = pipeline("text-classification", model= "jonas/sdg_classifier_osdg")
+#     return classifier
 
 
 
@@ -59,12 +60,11 @@ def app():
         
 
             
-        if 'docs' in st.session_state:
-            docs = st.session_state['docs']
-            docs_processed, df, all_text, par_list = clean.preprocessingForSDG(docs)
+        if 'filepath' in st.session_state:
+            paraList = runSDGPreprocessingPipeline()
             with st.spinner("Running SDG"):
 
-                df, x = sdg_classification(par_list)
+                df, x = sdg_classification(paraList)
 
 
                 # classifier = load_sdgClassifier()

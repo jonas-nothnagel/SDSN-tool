@@ -8,6 +8,7 @@ import pandas as pd
 import logging
 import re
 import string
+from haystack.pipelines import Pipeline
 import configparser
 config = configparser.ConfigParser()
 config.read_file(open('udfPreprocess/paramconfig.cfg'))
@@ -127,6 +128,8 @@ class FileConverter(BaseComponent):
 def basic(s, removePunc:bool = False):
 
     """
+    Performs basic cleaning of text.
+
     Params
     ----------
     s: string to be processed
@@ -148,7 +151,7 @@ def basic(s, removePunc:bool = False):
       s = s.translate(translator)
     # Remove distracting single quotes and dotted pattern
     s = re.sub("\'", " ", s)
-    s = re.sub("..","",s) 
+    s = s.replace("..","") 
     
     return s.strip()
 
@@ -165,8 +168,8 @@ class UdfPreProcessor(BaseComponent):
 
     """
     outgoing_edges = 1
-    split_overlap_word = config.get('preprocessor','SPLIT_OVERLAP_WORD')
-    split_overlap_sentence = config.get('preprocessor','SPLIT_OVERLAP_SENTENCE')
+    split_overlap_word = int(config.get('preprocessor','SPLIT_OVERLAP_WORD'))
+    split_overlap_sentence = int(config.get('preprocessor','SPLIT_OVERLAP_SENTENCE'))
 
     def run(self, documents:List[Document], removePunc:bool, 
             split_by: Literal["sentence", "word"] = 'sentence',
@@ -210,6 +213,8 @@ class UdfPreProcessor(BaseComponent):
             split_length=split_length,
             split_respect_sentence_boundary= split_respect_sentence_boundary,
             split_overlap=split_overlap,
+
+            # will add page number only in case of PDF not for text/docx file.
             add_page_number=True
             )
         
@@ -221,7 +226,7 @@ class UdfPreProcessor(BaseComponent):
         df = pd.DataFrame(docs_processed)
         all_text = " ".join(df.content.to_list())
         para_list = df.content.to_list()
-
+        logging.info('document split into {} paragraphs'.format(len(para_list)))
         output = {'documents': docs_processed,
                   'dataframe': df,
                   'text': all_text,
@@ -235,3 +240,19 @@ class UdfPreProcessor(BaseComponent):
             this method for the class.
         """
         return
+
+def processingpipeline():
+    """
+    Returns the preprocessing pipeline
+
+    """
+
+    preprocessing_pipeline = Pipeline()
+    fileconverter = FileConverter()
+    customPreprocessor = UdfPreProcessor()
+
+    preprocessing_pipeline.add_node(component=fileconverter, name="FileConverter", inputs=["File"])
+    preprocessing_pipeline.add_node(component = customPreprocessor, name ='UdfPreprocessor', inputs=["FileConverter"])
+
+    return preprocessing_pipeline
+

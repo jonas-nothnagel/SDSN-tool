@@ -16,10 +16,12 @@ def add_upload(choice):
                 # st.write("Uploaded Filename: ", uploaded_file.name)
                 file_name =  uploaded_file.name
                 file_path = temp.name
-                docs = pre.load_document(file_path, file_name)
-                haystackDoc, dataframeDoc, textData, paraList = clean.preprocessing(docs)
-                st.session_state['docs'] = docs
-                st.session_state['paraList'] = paraList
+                # docs = pre.load_document(file_path, file_name)
+                # haystackDoc, dataframeDoc, textData, paraList = clean.preprocessing(docs)
+                st.session_state['filename'] = file_name
+                # st.session_state['paraList'] = paraList
+                st.session_state['filepath'] = file_path
+
                 
 
     else:
@@ -30,6 +32,7 @@ def add_upload(choice):
           if option is 'South Africa:Low Emission strategy':
             file_name = file_path  = 'sample/South Africa_s Low Emission Development Strategy.txt'
             st.session_state['filename'] = file_name
+            st.sesion_state['filepath'] = file_path
             # st.write("Selected document:", file_name.split('/')[1])
             # with open('sample/South Africa_s Low Emission Development Strategy.txt') as dfile:
             # file = open('sample/South Africa_s Low Emission Development Strategy.txt', 'wb')
@@ -37,12 +40,13 @@ def add_upload(choice):
             # with open('sample/Ethiopia_s_2021_10 Year Development Plan.txt') as dfile:
             file_name = file_path =  'sample/Ethiopia_s_2021_10 Year Development Plan.txt'
             st.session_state['filename'] = file_name
+            st.sesion_state['filepath'] = file_path
             # st.write("Selected document:", file_name.split('/')[1])
           
-          if option is not None:
-            docs = pre.load_document(file_path,file_name)
-            haystackDoc, dataframeDoc, textData, paraList = clean.preprocessing(docs)
-            st.session_state['docs'] = docs
-            st.session_state['paraList'] = paraList
+          # if option is not None:
+          #   docs = pre.load_document(file_path,file_name)
+          #   haystackDoc, dataframeDoc, textData, paraList = clean.preprocessing(docs)
+          #   st.session_state['docs'] = docs
+          #   st.session_state['paraList'] = paraList
           
     
