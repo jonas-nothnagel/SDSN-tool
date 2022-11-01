@@ -55,7 +55,7 @@ class FileConverter(BaseComponent):
 
     def run(self, file_name: str , file_path: str, encoding: Optional[str]=None,
             id_hash_keys: Optional[List[str]] = None,
-            ) -> tuple(dict,str):
+            ) -> tuple[dict,str]:
         """ this is required method to invoke the component in 
             the pipeline implementation. 
             
