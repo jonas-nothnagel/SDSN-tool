@@ -33,7 +33,8 @@ def tokenize_lexical_query(query:str)-> List[str]:
      
     """
     nlp = spacy.load("en_core_web_sm")    
-    token_list = [token.text.lower() for token in nlp(query) if not (token.is_stop or token.is_punct)]
+    token_list = [token.text.lower() for token in nlp(query) 
+                  if not (token.is_stop or token.is_punct)]
     return token_list
 
 def runSpacyMatcher(token_list:List[str], document:Text):
@@ -91,7 +92,9 @@ def runRegexMatcher(token_list:List[str], document:Text):
     """
     matches = []
     for token in token_list:
-        matches = matches + [[val.start(), val.start()+ len(token)] for val in re.finditer(token, document)]
+        matches = (matches + 
+                  [[val.start(), val.start() + 
+                  len(token)] for val in re.finditer(token, document)])
     
     return matches, document
 
@@ -109,7 +112,9 @@ def searchAnnotator(matches: List[List[int]], document):
     for match in matches:
         start_idx = match[0]
         end_idx = match[1]
-        annotated_text = annotated_text + document[start:start_idx].text + str(annotation(body=document[start_idx:end_idx].text, label="ANSWER", background="#964448", color='#ffffff'))
+        annotated_text = (annotated_text + document[start:start_idx].text 
+                          + str(annotation(body=document[start_idx:end_idx].text,
+                         label="ANSWER", background="#964448", color='#ffffff')))
         start = end_idx
     
     st.write(
@@ -131,8 +136,9 @@ def lexical_search(query:Text,documents:List[Document]):
     results = retriever.retrieve(query=query, 
                             top_k= int(config.get('lexical_search','TOP_K')))
     query_tokens = tokenize_lexical_query(query)
-    for result in results:
+    for count, result in enumerate(results):
         matches, doc = runSpacyMatcher(query_tokens,result.content)
+        st.write("Result {}".format(count))
         searchAnnotator(matches, doc)
 
 def runLexicalPreprocessingPipeline()->List[Document]:

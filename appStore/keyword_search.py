@@ -75,5 +75,6 @@ def app():
                         logging.info("performing lexical search")
                         # token_list = tokenize_lexical_query(queryList)
                         with st.spinner("Performing Exact matching search (Lexical search) for you"):
+                            st.markdown("##### Top few lexical search (TFIDF) hits #####")
                             lexical_search(queryList,paraList)
                     
