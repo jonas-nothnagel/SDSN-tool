@@ -12,7 +12,7 @@ from typing import List, Tuple, Text
 from utils.preprocessing import processingpipeline
 
 config = configparser.ConfigParser()
-config.read_file(open('paramconfig.py'))
+config.read_file(open('paramconfig.cfg'))
 
 
 def tokenize_lexical_query(query:str)-> List[str]:
