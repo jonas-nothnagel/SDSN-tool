@@ -139,8 +139,9 @@ def lexical_search(query:Text,documents:List[Document]):
                             top_k= int(config.get('lexical_search','TOP_K')))
     query_tokens = tokenize_lexical_query(query)
     for count, result in enumerate(results):
-        if result.content != "":
-            matches, doc = runSpacyMatcher(query_tokens,result.content)
+        # if result.content != "":
+        matches, doc = runSpacyMatcher(query_tokens,result.content)
+        if len(matches) != 0:
             st.write("Result {}".format(count))
             searchAnnotator(matches, doc)
 
@@ -192,12 +193,14 @@ def runSemanticPreprocessingPipeline()->List[Document]:
     sdg_processing_pipeline = processingpipeline()
     split_by = config.get('lexical_search','SPLIT_BY')
     split_length = int(config.get('lexical_search','SPLIT_LENGTH'))
+    split_overlap = int(config.get('lexical_search','SPLIT_OVERLAP'))
 
     output_lexical_pre = sdg_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
                                         "UdfPreProcessor": {"removePunc": False, \
                                             "split_by": split_by, \
-                                            "split_length":split_length}})
+                                            "split_length":split_length,\
+                                            "split_overlap": split_overlap}})
 
-    return output_lexical_pre['documents']   
+    return output_lexical_pre['documents']
