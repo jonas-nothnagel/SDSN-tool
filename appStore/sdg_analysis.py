@@ -46,7 +46,12 @@ def app():
             
         if 'filepath' in st.session_state:
             paraList = runSDGPreprocessingPipeline()
-            with st.spinner("Running SDG"):
+            if len(paraList) > 150:
+                warning_msg = ": This might take some, please sit back and relax."
+            else:
+                warning_msg = ""
+
+            with st.spinner("Running SDG Classification{}".format(warning_msg)):
 
                 df, x = sdg_classification(paraList)
 
