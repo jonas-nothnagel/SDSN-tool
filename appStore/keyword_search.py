@@ -5,8 +5,7 @@ sys.path.append('../utils')
 import streamlit as st
 import json
 import logging
-from utils.search import runLexicalPreprocessingPipeline, tokenize_lexical_query
-from utils.search import runSpacyMatcher, lexical_search
+from utils.search import runLexicalPreprocessingPipeline, lexical_search
 
 def app():
 

@@ -86,12 +86,15 @@ def runSDGPreprocessingPipeline()->List[Document]:
     sdg_processing_pipeline = processingpipeline()
     split_by = config.get('sdg','SPLIT_BY')
     split_length = int(config.get('sdg','SPLIT_LENGTH'))
+    split_overlap = int(config.get('sdg','SPLIT_OVERLAP'))
+
 
     output_sdg_pre = sdg_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
                                      "UdfPreProcessor": {"removePunc": False, \
                                             "split_by": split_by, \
-                                            "split_length":split_length}})
+                                            "split_length":split_length,\
+                                            "split_overlap": split_overlap}})
     
     return output_sdg_pre['documents']

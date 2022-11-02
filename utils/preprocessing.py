@@ -167,12 +167,12 @@ class UdfPreProcessor(BaseComponent):
 
     """
     outgoing_edges = 1
-    split_overlap_word = int(config.get('preprocessor','SPLIT_OVERLAP_WORD'))
-    split_overlap_sentence = int(config.get('preprocessor','SPLIT_OVERLAP_SENTENCE'))
+    # split_overlap_word = int(config.get('preprocessor','SPLIT_OVERLAP_WORD'))
+    # split_overlap_sentence = int(config.get('preprocessor','SPLIT_OVERLAP_SENTENCE'))
 
     def run(self, documents:List[Document], removePunc:bool, 
             split_by: Literal["sentence", "word"] = 'sentence',
-            split_length:int = 2):
+            split_length:int = 2, split_overlap = 0):
 
         """ this is required method to invoke the component in 
         the pipeline implementation. 
@@ -198,11 +198,11 @@ class UdfPreProcessor(BaseComponent):
         
         if split_by == 'sentence':
             split_respect_sentence_boundary = False
-            split_overlap=self.split_overlap_sentence
+            # split_overlap=self.split_overlap_sentence
     
         else:
             split_respect_sentence_boundary = True
-            split_overlap= self.split_overlap_word
+            # split_overlap= self.split_overlap_word
       
         preprocessor = PreProcessor(
             clean_empty_lines=True,
