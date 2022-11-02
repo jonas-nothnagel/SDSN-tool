@@ -109,7 +109,7 @@ def searchAnnotator(matches: List[List[int]], document):
     for match in matches:
         start_idx = match[0]
         end_idx = match[1]
-        annotated_text = annotated_text + document[start:start_idx] + str(annotation(body=document[start_idx:end_idx], label="ANSWER", background="#964448", color='#ffffff'))
+        annotated_text = annotated_text + document[start:start_idx].text + str(annotation(body=document[start_idx:end_idx].text, label="ANSWER", background="#964448", color='#ffffff'))
         start = end_idx
     
     st.write(

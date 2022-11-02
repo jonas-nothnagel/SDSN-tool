@@ -11,7 +11,7 @@ pdfplumber==0.6.2
 Pillow==9.1.1
 seaborn==0.11.2
 transformers==4.21.2
-st-annotated-text
-markdown
+st-annotated-text==3.0.0
+markdown==3.4.1
 python-docx
 streamlit_option_menu
