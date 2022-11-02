@@ -33,7 +33,7 @@ def tokenize_lexical_query(query:str)-> List[str]:
      
     """
     nlp = spacy.load("en_core_web_sm")    
-    token_list = [token.text.lower() for token in nlp(query) if not token.is_stop]
+    token_list = [token.text.lower() for token in nlp(query) if not (token.is_stop or token.is_punct)]
     return token_list
 
 def runSpacyMatcher(token_list:List[str], document:Text):

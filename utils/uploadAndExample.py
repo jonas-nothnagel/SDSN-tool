@@ -33,7 +33,7 @@ def add_upload(choice):
         if option is 'South Africa:Low Emission strategy':
             file_name = file_path  = 'docStore/sample/South Africa_s Low Emission Development Strategy.txt'
             st.session_state['filename'] = file_name
-            st.sesion_state['filepath'] = file_path
+            st.session_state['filepath'] = file_path
         else:
             file_name = file_path =  'docStore/sample/Ethiopia_s_2021_10 Year Development Plan.txt'
             st.session_state['filename'] = file_name
