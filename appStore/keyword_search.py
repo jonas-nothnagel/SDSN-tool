@@ -83,6 +83,6 @@ def app():
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
                             st.markdown("##### Top few semantic search results #####")
-                            semantic_search(queryList,paraList,show_answers=True)
+                            semantic_search(queryList,paraList,show_answers=False)
 
                     

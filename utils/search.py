@@ -291,6 +291,7 @@ def semantic_search(query:Text,documents:List[Document],show_answers = False):
     else:
         
         for answer in results['answers']:
+            st.write(answer)
             matches = []
             doc = []
             if answer.score >0.01:
@@ -301,14 +302,6 @@ def semantic_search(query:Text,documents:List[Document],show_answers = False):
                 matches.append([start_idx,end_idx])
                 doc.append(doc_store.get_document_by_id(temp['document_id']).content)
                 searchAnnotator(matches,doc)
-        
 
-
-            
-
-            
-
-
-    return results
 
 
