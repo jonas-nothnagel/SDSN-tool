@@ -1,4 +1,6 @@
-from haystack.nodes import TfidfRetriever
+from haystack.nodes import TfidfRetriever, TransformersQueryClassifier
+from haystack.nodes import EmbeddingRetriever, FARMReader
+from haystack.nodes.base import BaseComponent
 from haystack.document_stores import InMemoryDocumentStore
 import configparser
 import spacy
@@ -8,8 +10,9 @@ import streamlit as st
 from markdown import markdown
 from annotated_text import annotation
 from haystack.schema import Document
-from typing import List, Tuple, Text
+from typing import List, Text
 from utils.preprocessing import processingpipeline
+from haystack.pipelines import Pipeline
 
 config = configparser.ConfigParser()
 config.read_file(open('paramconfig.cfg'))
@@ -142,7 +145,7 @@ def lexical_search(query:Text,documents:List[Document]):
         # if result.content != "":
         matches, doc = runSpacyMatcher(query_tokens,result.content)
         if len(matches) != 0:
-            st.write("Result {}".format(count))
+            st.write("Result {}".format(count+1))
             searchAnnotator(matches, doc)
 
 def runLexicalPreprocessingPipeline()->List[Document]:
@@ -153,19 +156,19 @@ def runLexicalPreprocessingPipeline()->List[Document]:
     Return
     --------------
     List[Document]: When preprocessing pipeline is run, the output dictionary 
-    has four objects. For the Haysatck implementation of SDG classification we, 
+    has four objects. For the lexicaal search using TFIDFRetriever we 
     need to use the List of Haystack Document, which can be fetched by 
     key = 'documents' on output.
 
     """
     file_path = st.session_state['filepath']
     file_name = st.session_state['filename']
-    sdg_processing_pipeline = processingpipeline()
+    lexical_processing_pipeline = processingpipeline()
     split_by = config.get('lexical_search','SPLIT_BY')
     split_length = int(config.get('lexical_search','SPLIT_LENGTH'))
     split_overlap = int(config.get('lexical_search','SPLIT_OVERLAP'))
 
-    output_lexical_pre = sdg_processing_pipeline.run(file_paths = file_path, 
+    output_lexical_pre = lexical_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
                                         "UdfPreProcessor": {"removePunc": False, \
@@ -183,19 +186,19 @@ def runSemanticPreprocessingPipeline()->List[Document]:
     Return
     --------------
     List[Document]: When preprocessing pipeline is run, the output dictionary 
-    has four objects. For the Haysatck implementation of SDG classification we, 
+    has four objects. For the Haysatck implementation of semantic search we, 
     need to use the List of Haystack Document, which can be fetched by 
     key = 'documents' on output.
 
     """
     file_path = st.session_state['filepath']
     file_name = st.session_state['filename']
-    sdg_processing_pipeline = processingpipeline()
-    split_by = config.get('lexical_search','SPLIT_BY')
-    split_length = int(config.get('lexical_search','SPLIT_LENGTH'))
-    split_overlap = int(config.get('lexical_search','SPLIT_OVERLAP'))
+    semantic_processing_pipeline = processingpipeline()
+    split_by = config.get('semantic_search','SPLIT_BY')
+    split_length = int(config.get('semantic_search','SPLIT_LENGTH'))
+    split_overlap = int(config.get('semantic_search','SPLIT_OVERLAP'))
 
-    output_lexical_pre = sdg_processing_pipeline.run(file_paths = file_path, 
+    output_semantic_pre = semantic_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
                                         "UdfPreProcessor": {"removePunc": False, \
@@ -203,4 +206,108 @@ def runSemanticPreprocessingPipeline()->List[Document]:
                                             "split_length":split_length,\
                                             "split_overlap": split_overlap}})
 
-    return output_lexical_pre['documents']
+    return output_semantic_pre['documents']
+
+class QueryCheck(BaseComponent):
+
+    outgoing_edges = 1
+
+    def run(self, query):
+
+        query_classifier =  TransformersQueryClassifier(model_name_or_path=
+                            "shahrukhx01/bert-mini-finetune-question-detection")
+
+        
+        result = query_classifier.run(query=query)
+
+        if result[1] == "output_1":
+            output = {"query":query,
+                       "query_type": 'question/statement'}
+        else:
+            output = {"query": "find all issues related to {}".format(query),
+                      "query_type": 'statements/keyword'}
+
+        return output, "output_1"
+    
+    def run_batch(self, query):
+        pass
+
+
+def semanticSearchPipeline(documents, show_answers = False):
+    document_store = InMemoryDocumentStore()
+    document_store.write_documents(documents)
+
+    embedding_model = config.get('semantic_search','RETRIEVER')
+    embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+    embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+    retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+    
+
+    
+    querycheck = QueryCheck()
+    retriever = EmbeddingRetriever(
+                document_store=document_store,
+                embedding_model=embedding_model,top_k = retriever_top_k,
+                emb_extraction_layer=embedding_layer, scale_score =True,
+                model_format=embedding_model_format, use_gpu = True)
+    document_store.update_embeddings(retriever)
+    
+
+    semanticsearch_pipeline = Pipeline()
+    semanticsearch_pipeline.add_node(component = querycheck, name = "QueryCheck",
+                                    inputs = ["Query"])
+    semanticsearch_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
+                                    inputs = ["QueryCheck.output_1"])
+    if show_answers == True:
+        reader_model = config.get('semantic_search','READER')
+        reader_top_k = retriever_top_k
+        reader = FARMReader(model_name_or_path=reader_model,
+                        top_k = reader_top_k, use_gpu=True)
+    
+        semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
+                                        inputs= ["EmbeddingRetriever"])
+    
+    return semanticsearch_pipeline, document_store
+
+def semantic_search(query:Text,documents:List[Document],show_answers = False):
+    """
+    Performs the Lexical search on the List of haystack documents which is 
+    returned by preprocessing Pipeline.
+    """
+    threshold = 0.4
+    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents, 
+                                                    show_answers=show_answers)
+    results = semanticsearch_pipeline.run(query = query)
+    
+    
+    if show_answers == False:
+        results = results['documents']
+        for i,queryhit in enumerate(results):
+                            
+            if queryhit.score > threshold:
+                st.write("\t {}: \t {}".format(i+1, queryhit.content.replace("\n", " ")))
+                st.markdown("---")
+        
+    else:
+        matches = []
+        doc = []
+        for answer in results['answers']:
+            if answer.score >0.01:
+                temp = answer.to_dict()
+                start_idx = temp['offsets_in_document'][0]['start']
+                end_idx = temp['offsets_in_document'][0]['end']
+
+                matches.append([start_idx,end_idx])
+                doc.append(doc_store.get_document_by_id(temp['document_id']).content)
+        searchAnnotator(matches,doc)
+        
+
+
+            
+
+            
+
+
+    return results
+
+

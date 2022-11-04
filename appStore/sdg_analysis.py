@@ -47,7 +47,7 @@ def app():
         if 'filepath' in st.session_state:
             paraList = runSDGPreprocessingPipeline()
             if len(paraList) > 150:
-                warning_msg = ": This might take some, please sit back and relax."
+                warning_msg = ": This might take sometime, please sit back and relax."
             else:
                 warning_msg = ""
 

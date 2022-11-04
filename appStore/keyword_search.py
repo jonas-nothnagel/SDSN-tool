@@ -6,6 +6,7 @@ import streamlit as st
 import json
 import logging
 from utils.search import runLexicalPreprocessingPipeline, lexical_search
+from utils.search import runSemanticPreprocessingPipeline, semantic_search
 
 def app():
 
@@ -46,11 +47,13 @@ def app():
         else:
             keywordList = None
         
-        searchtype = st.selectbox("Do you want to find exact macthes or similar meaning/context", ['Exact Matches', 'Similar context/meaning'])
+        searchtype = st.selectbox("Do you want to find exact macthes or similar meaning/context",
+                                 ['Exact Matches', 'Similar context/meaning'])
     
     with st.container():
         if keywordList is not None:
-            queryList = st.text_input("You selcted the {} category we will look for these keywords in document".format(genre),
+            queryList = st.text_input("You selcted the {} category we \
+                        will look for these keywords in document".format(genre),
                                     value="{}".format(keywordList))
         else:
             queryList = st.text_input("Please enter here your question and we will look \
@@ -67,13 +70,19 @@ def app():
                 logging.warning("Terminated as no keyword provided")
             else:
                 if 'filepath' in st.session_state:
-                    paraList = runLexicalPreprocessingPipeline()
+                    
 
                     if searchtype == 'Exact Matches':
-                        # queryList = list(queryList.split(","))
+                        paraList = runLexicalPreprocessingPipeline()
                         logging.info("performing lexical search")
-                        # token_list = tokenize_lexical_query(queryList)
                         with st.spinner("Performing Exact matching search (Lexical search) for you"):
                             st.markdown("##### Top few lexical search (TFIDF) hits #####")
                             lexical_search(queryList,paraList)
+                    else:
+                        paraList = runSemanticPreprocessingPipeline()
+                        logging.info("starting semantic search")
+                        with st.spinner("Performing Similar/Contextual search"):
+                            st.markdown("##### Top few semantic search results #####")
+                            semantic_search(queryList,paraList,show_answers=True)
+
                     
