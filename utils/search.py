@@ -289,9 +289,10 @@ def semantic_search(query:Text,documents:List[Document],show_answers = False):
                 st.markdown("---")
         
     else:
-        matches = []
-        doc = []
+        
         for answer in results['answers']:
+            matches = []
+            doc = []
             if answer.score >0.01:
                 temp = answer.to_dict()
                 start_idx = temp['offsets_in_document'][0]['start']
@@ -299,7 +300,7 @@ def semantic_search(query:Text,documents:List[Document],show_answers = False):
 
                 matches.append([start_idx,end_idx])
                 doc.append(doc_store.get_document_by_id(temp['document_id']).content)
-        searchAnnotator(matches,doc)
+                searchAnnotator(matches,doc)
         
 
 
