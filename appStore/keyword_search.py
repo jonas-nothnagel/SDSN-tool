@@ -49,6 +49,8 @@ def app():
         
         searchtype = st.selectbox("Do you want to find exact macthes or similar meaning/context",
                                  ['Exact Matches', 'Similar context/meaning'])
+
+
     
     with st.container():
         if keywordList is not None:
@@ -79,6 +81,7 @@ def app():
                             st.markdown("##### Top few lexical search (TFIDF) hits #####")
                             lexical_search(queryList,paraList)
                     else:
+                        st.sidebar(show_answer = st.check("Show context"))
                         paraList = runSemanticPreprocessingPipeline()
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
