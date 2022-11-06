@@ -5,8 +5,8 @@ sys.path.append('../utils')
 import streamlit as st
 import json
 import logging
-from utils.search import runLexicalPreprocessingPipeline, lexical_search
-from utils.search import runSemanticPreprocessingPipeline, semantic_search
+from utils.lexical_search import runLexicalPreprocessingPipeline, lexical_search
+from utils.semantic_search import runSemanticPreprocessingPipeline, semantic_search
 
 def app():
 
