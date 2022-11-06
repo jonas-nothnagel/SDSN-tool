@@ -49,6 +49,9 @@ def app():
         
         searchtype = st.selectbox("Do you want to find exact macthes or similar meaning/context",
                                  ['Exact Matches', 'Similar context/meaning'])
+        if searchtype == 'Similar context/meaning':
+            show_answers = st.sidebar.checkbox("Show context")
+
 
 
     
@@ -73,7 +76,6 @@ def app():
             else:
                 if 'filepath' in st.session_state:
                     
-
                     if searchtype == 'Exact Matches':
                         paraList = runLexicalPreprocessingPipeline()
                         logging.info("performing lexical search")
@@ -81,7 +83,7 @@ def app():
                             st.markdown("##### Top few lexical search (TFIDF) hits #####")
                             lexical_search(queryList,paraList)
                     else:
-                        show_answers = st.sidebar.checkbox("Show context")
+                        
                         paraList = runSemanticPreprocessingPipeline()
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
