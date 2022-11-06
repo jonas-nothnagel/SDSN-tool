@@ -81,7 +81,7 @@ def app():
                             st.markdown("##### Top few lexical search (TFIDF) hits #####")
                             lexical_search(queryList,paraList)
                     else:
-                        st.sidebar(show_answer = st.check("Show context"))
+                        st.sidebar(show_answer = st.checkbox("Show context"))
                         paraList = runSemanticPreprocessingPipeline()
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
