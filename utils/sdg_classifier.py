@@ -52,7 +52,7 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
 
     if check_streamlit():
         st.write("caching model")
-        classifier = st.cache(load_sdgClassifier(), allow_output_mutation=True)
+        classifier = st.cache(load_sdgClassifier, allow_output_mutation=True)
     else:
         classifier = load_sdgClassifier()
     results = classifier.predict(haystackdoc)
