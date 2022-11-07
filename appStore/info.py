@@ -13,10 +13,12 @@ def app():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     footer = """
            <div class="footer-custom">
+               Guidance & Feedback - <a href="https://www.linkedin.com/in/maren-bernlöhr-149891222" target="_blank">Maren Bernlöhr</a> |
+               <a href="https://www.linkedin.com/in/manuelkuhm" target="_blank">Manuel Kuhm</a> 
                Developer - <a href="https://www.linkedin.com/in/erik-lehmann-giz/" target="_blank">Erik Lehmann</a>  |   
                <a href="https://www.linkedin.com/in/jonas-nothnagel-bb42b114b/" target="_blank">Jonas Nothnagel</a>   |
                <a href="https://www.linkedin.com/in/prashantpsingh/" target="_blank">Prashant Singh</a> |
-               Guidance & Feedback - Maren Bernlöhr | Manuel Kuhn </a>
+               
            </div>
        """
     st.markdown(footer, unsafe_allow_html=True)
