@@ -16,6 +16,7 @@ from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
 from utils.sdg_classifier import sdg_classification
 from utils.sdg_classifier import runSDGPreprocessingPipeline
+from utils.streamlitcheck import check_streamlit
 import tempfile
 import sqlite3
 import logging
@@ -42,37 +43,41 @@ def app():
         st.markdown("")
 
 
-    with st.container():       
+    with st.container():
+        if check_streamlit():
+            st.write(True)
+        else:
+            st.write(False)       
             
-        if 'filepath' in st.session_state:
-            paraList = runSDGPreprocessingPipeline()
-            if len(paraList) > 150:
-                warning_msg = ": This might take sometime, please sit back and relax."
-            else:
-                warning_msg = ""
+        # if 'filepath' in st.session_state:
+        #     paraList = runSDGPreprocessingPipeline()
+        #     if len(paraList) > 150:
+        #         warning_msg = ": This might take sometime, please sit back and relax."
+        #     else:
+        #         warning_msg = ""
 
-            with st.spinner("Running SDG Classification{}".format(warning_msg)):
+        #     with st.spinner("Running SDG Classification{}".format(warning_msg)):
 
-                df, x = sdg_classification(paraList)
+        #         df, x = sdg_classification(paraList)
 
-                plt.rcParams['font.size'] = 25
-                colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
-                # plot
-                fig, ax = plt.subplots()
-                ax.pie(x, colors=colors, radius=2, center=(4, 4),
-                    wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
-                    frame=False,labels =list(x.index))
-                # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
-                st.markdown("#### Anything related to SDGs? ####")
+        #         plt.rcParams['font.size'] = 25
+        #         colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
+        #         # plot
+        #         fig, ax = plt.subplots()
+        #         ax.pie(x, colors=colors, radius=2, center=(4, 4),
+        #             wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
+        #             frame=False,labels =list(x.index))
+        #         # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
+        #         st.markdown("#### Anything related to SDGs? ####")
 
-                c4, c5, c6 = st.columns([2, 2, 2])
+        #         c4, c5, c6 = st.columns([2, 2, 2])
 
-                with c5:
-                    st.pyplot(fig)
+        #         with c5:
+        #             st.pyplot(fig)
                     
-                c7, c8, c9 = st.columns([1, 10, 1])
-                with c8:
-                    st.table(df)
+        #         c7, c8, c9 = st.columns([1, 10, 1])
+        #         with c8:
+        #             st.table(df)
 
 
 #     1. Keyword heatmap \n
