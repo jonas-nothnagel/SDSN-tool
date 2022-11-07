@@ -8,7 +8,7 @@ def check_streamlit():
         True if code is run within streamlit, else False
     """
     try:
-        from streamlit.script_run_context import get_script_run_ctx
+        from st.script_run_context import get_script_run_ctx
         if not get_script_run_ctx():
             use_streamlit = False
         else:
