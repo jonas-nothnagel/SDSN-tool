@@ -28,6 +28,7 @@ def load_sdgClassifier():
     return doc_classifier
 
 
+
 def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
