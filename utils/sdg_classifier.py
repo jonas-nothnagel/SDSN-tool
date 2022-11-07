@@ -3,7 +3,7 @@ from haystack.schema import Document
 from typing import List, Tuple
 import configparser
 import streamlit as st
-from utils.streamlitcheck import check_streamlit
+# from utils.streamlitcheck import check_streamlit
 from pandas import DataFrame, Series
 import logging
 from utils.preprocessing import processingpipeline
