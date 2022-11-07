@@ -15,10 +15,19 @@ config = configparser.ConfigParser()
 config.read_file(open('paramconfig.cfg'))
 
 class QueryCheck(BaseComponent):
+    """
+    Uses Query Classifier from Haystack, process the query based on query type
+    """
 
     outgoing_edges = 1
 
     def run(self, query):
+        """
+        mandatory method to use the cusotm node. Determines the query type, if 
+        if the query is of type keyword/statement will modify it to make it more
+        useful for sentence transoformers.
+        
+        """
 
         query_classifier =  TransformersQueryClassifier(model_name_or_path=
                             "shahrukhx01/bert-mini-finetune-question-detection")
@@ -32,7 +41,6 @@ class QueryCheck(BaseComponent):
         else:
             output = {"query": "find all issues related to {}".format(query),
                       "query_type": 'statements/keyword'}
-
         return output, "output_1"
     
     def run_batch(self, query):
@@ -69,7 +77,30 @@ def runSemanticPreprocessingPipeline()->List[Document]:
     return output_semantic_pre['documents']
 
 
-def semanticSearchPipeline(documents, show_answers = False):
+def semanticSearchPipeline(documents:List[Document]):
+    """
+    creates the semantic search pipeline and document Store object from the
+    list of haystack documents. Retriever and Reader model are read from 
+    paramconfig. The top_k for the Reader and Retirever are kept same, so that 
+    all the results returned by Retriever are used, however the context is 
+    extracted by Reader for each retrieved result. The querycheck is added as
+    node to process the query.
+
+    
+    Params
+    ----------
+    documents: list of Haystack Documents, returned by preprocessig pipeline.
+
+    Return
+    ---------
+    semanticsearch_pipeline: Haystack Pipeline object, with all the necessary 
+    nodes [QueryCheck, Retriever, Reader]
+
+    document_store: As retriever cna work only with Haystack Document Store, the
+    list of document returned by preprocessing pipeline.
+
+    """
+    
     document_store = InMemoryDocumentStore()
     document_store.write_documents(documents)
 
@@ -87,6 +118,10 @@ def semanticSearchPipeline(documents, show_answers = False):
                 emb_extraction_layer=embedding_layer, scale_score =True,
                 model_format=embedding_model_format, use_gpu = True)
     document_store.update_embeddings(retriever)
+    reader_model = config.get('semantic_search','READER')
+    reader_top_k = retriever_top_k
+    reader = FARMReader(model_name_or_path=reader_model,
+                    top_k = reader_top_k, use_gpu=True)
     
 
     semanticsearch_pipeline = Pipeline()
@@ -94,14 +129,8 @@ def semanticSearchPipeline(documents, show_answers = False):
                                     inputs = ["Query"])
     semanticsearch_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
                                     inputs = ["QueryCheck.output_1"])
-    if show_answers == True:
-        reader_model = config.get('semantic_search','READER')
-        reader_top_k = retriever_top_k
-        reader = FARMReader(model_name_or_path=reader_model,
-                        top_k = reader_top_k, use_gpu=True)
-    
-        semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
-                                        inputs= ["EmbeddingRetriever"])
+    semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
+                                    inputs= ["EmbeddingRetriever"])
     
     return semanticsearch_pipeline, document_store
 
@@ -132,41 +161,25 @@ def semanticsearchAnnotator(matches: List[List[int]], document):
         )
 
 
-def semantic_search(query:Text,documents:List[Document],show_answers = False):
+def semantic_search(query:Text,documents:List[Document]):
     """
-    Performs the Lexical search on the List of haystack documents which is 
+    Performs the Semantic search on the List of haystack documents which is 
     returned by preprocessing Pipeline.
+
+    Params
+    -------
+    query: Keywords that need to be searche in documents.
+    documents: List fo Haystack documents returned by preprocessing pipeline.
+    
     """
-    threshold = 0.4
-    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents, 
-                                                    show_answers=show_answers)
+    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents)
     results = semanticsearch_pipeline.run(query = query)
-    
-    
-    if show_answers == False:
-        results = results['documents']
-        for i,queryhit in enumerate(results):
-                            
-            if queryhit.score > threshold:
-                st.write("\t {}: \t {}".format(i+1, queryhit.content.replace("\n", " ")))
-                st.markdown("---")
-        
-    else:
-        
-        for answer in results['answers']:
-            # st.write(answer)
-            # matches = []
-            # doc = []
-            if answer.score >0.01:
-                temp = answer.to_dict()
-                start_idx = temp['offsets_in_document'][0]['start']
-                end_idx = temp['offsets_in_document'][0]['end']
-
-                # matches.append([start_idx,end_idx])
-                # doc.append(doc_store.get_document_by_id(temp['document_id']).content)
-                match = [[start_idx,end_idx]]
-                doc = doc_store.get_document_by_id(temp['document_id']).content
-                semanticsearchAnnotator(match,doc)
-
-
-
+    st.markdown("##### Top few semantic search results #####")
+    for i,answer in enumerate(results['answers']):
+        temp = answer.to_dict()
+        start_idx = temp['offsets_in_document'][0]['start']
+        end_idx = temp['offsets_in_document'][0]['end']
+        match = [[start_idx,end_idx]]
+        doc = doc_store.get_document_by_id(temp['document_id']).content
+        st.write("Result {}".format(i+1))
+        semanticsearchAnnotator(match, doc)

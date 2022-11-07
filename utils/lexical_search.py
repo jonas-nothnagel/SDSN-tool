@@ -160,6 +160,12 @@ def lexical_search(query:Text,documents:List[Document]):
     """
     Performs the Lexical search on the List of haystack documents which is 
     returned by preprocessing Pipeline.
+
+    Params
+    -------
+    query: Keywords that need to be searche in documents.
+    documents: List fo Haystack documents returned by preprocessing pipeline.
+    
     """
 
     document_store = InMemoryDocumentStore()

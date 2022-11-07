@@ -49,8 +49,8 @@ def app():
         
         searchtype = st.selectbox("Do you want to find exact macthes or similar meaning/context",
                                  ['Exact Matches', 'Similar context/meaning'])
-        if searchtype == 'Similar context/meaning':
-            show_answers = st.sidebar.checkbox("Show context")
+        # if searchtype == 'Similar context/meaning':
+        #     show_answers = st.sidebar.checkbox("Show context")
 
 
 
@@ -87,10 +87,6 @@ def app():
                         paraList = runSemanticPreprocessingPipeline()
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
-                            st.markdown("##### Top few semantic search results #####")
-                            if show_answers:
-                                semantic_search(queryList,paraList,show_answers=True)
-                            else:
-                                semantic_search(queryList,paraList,show_answers=False)
+                            semantic_search(queryList,paraList,show_answers=True)
 
                     
