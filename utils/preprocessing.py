@@ -23,7 +23,7 @@ def useOCR(file_path: str)-> Text:
     file_path: file_path of uploade file, returned by add_upload function in 
     uploadAndExample.py
     
-    Returns the text files as string.
+    Returns the text file as string.
     """
 
     
@@ -242,7 +242,8 @@ class UdfPreProcessor(BaseComponent):
 
 def processingpipeline():
     """
-    Returns the preprocessing pipeline
+    Returns the preprocessing pipeline. Will use FileConverter and UdfPreProcesor 
+    from utils.
 
     """
 

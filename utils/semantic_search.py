@@ -107,19 +107,25 @@ def semanticSearchPipeline(documents:List[Document]):
 
             document_store = InMemoryDocumentStore()
             document_store.write_documents(documents)
+            if 'retriever' in st.session_state:
+                retriever = st.session_state['retriever']
+                document_store.update_embeddings(retriever)
+                # querycheck = 
 
+
+            # embedding_model = config.get('semantic_search','RETRIEVER')
+            # embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+            # embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+            # retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+            # retriever = EmbeddingRetriever(
+            #     document_store=document_store,
+            #     embedding_model=embedding_model,top_k = retriever_top_k,
+            #     emb_extraction_layer=embedding_layer, scale_score =True,
+            #     model_format=embedding_model_format, use_gpu = True)
+            # document_store.update_embeddings(retriever)
+        else:
             embedding_model = config.get('semantic_search','RETRIEVER')
             embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
-            embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
-            retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
-            retriever = EmbeddingRetriever(
-                document_store=document_store,
-                embedding_model=embedding_model,top_k = retriever_top_k,
-                emb_extraction_layer=embedding_layer, scale_score =True,
-                model_format=embedding_model_format, use_gpu = True)
-            document_store.update_embeddings(retriever)
-        else:
-
             retriever = EmbeddingRetriever(
                 document_store=document_store,
                 embedding_model=embedding_model,top_k = retriever_top_k,
@@ -134,13 +140,24 @@ def semanticSearchPipeline(documents:List[Document]):
         embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
         embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
         retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+        
+        
         retriever = EmbeddingRetriever(
             document_store=document_store,
             embedding_model=embedding_model,top_k = retriever_top_k,
             emb_extraction_layer=embedding_layer, scale_score =True,
             model_format=embedding_model_format, use_gpu = True)
+        st.session_state['retriever'] = retriever
         document_store.update_embeddings(retriever)
         st.session_state['document_store'] = document_store
+        querycheck = QueryCheck()
+        st.session_state['querycheck'] = querycheck
+        reader_model = config.get('semantic_search','READER')
+        reader_top_k = retriever_top_k
+        reader = FARMReader(model_name_or_path=reader_model,
+                        top_k = reader_top_k, use_gpu=True)
+        
+        st.session_state['reader'] = reader
 
     querycheck = QueryCheck()
     

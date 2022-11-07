@@ -3,13 +3,14 @@ from haystack.schema import Document
 from typing import List, Tuple
 import configparser
 import streamlit as st
+from utils.streamlitcheck import check_streamlit
 from pandas import DataFrame, Series
 import logging
 from utils.preprocessing import processingpipeline
 config = configparser.ConfigParser()
 config.read_file(open('paramconfig.cfg'))
 
-@st.cache(allow_output_mutation=True)
+
 def load_sdgClassifier():
     """
     loads the document classifier using haystack, where the name/path of model
@@ -49,11 +50,14 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     logging.info("running SDG classifiication")
     threshold = float(config.get('sdg','THRESHOLD'))
 
-
-    classifier = load_sdgClassifier()
+    if check_streamlit():
+        st.write("caching model")
+        classifier = st.cache(load_sdgClassifier(), allow_output_mutation=True)
+    else:
+        classifier = load_sdgClassifier()
     results = classifier.predict(haystackdoc)
 
-    
+
     labels_= [(l.meta['classification']['label'],
                l.meta['classification']['score'],l.content,) for l in results]
 
@@ -68,10 +72,19 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
 
     return df, x
 
-def runSDGPreprocessingPipeline()->List[Document]:
+def runSDGPreprocessingPipeline(file_path = None, file_name = None)->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
+
+    Param
+    ------------
+
+    file_path: filepath, if not given will check for file_path in streamlit 
+    session_state, else will return 
+
+    file_name: filename, if not given will check for file_name in streamlit 
+    session_state
     
     Return
     --------------
@@ -81,6 +94,7 @@ def runSDGPreprocessingPipeline()->List[Document]:
     key = 'documents' on output.
 
     """
+    # if file_path:
     file_path = st.session_state['filepath']
     file_name = st.session_state['filename']
     sdg_processing_pipeline = processingpipeline()

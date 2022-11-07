@@ -89,4 +89,10 @@ def app():
                         with st.spinner("Performing Similar/Contextual search"):
                             semantic_search(queryList,paraList)
 
+                else:
+                    st.info("🤔 No document found, please try to upload it at the sidebar!")
+                    logging.warning("Terminated as no document provided")
+        
+
+
                     
