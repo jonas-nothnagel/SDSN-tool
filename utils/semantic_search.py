@@ -100,24 +100,50 @@ def semanticSearchPipeline(documents:List[Document]):
     list of document returned by preprocessing pipeline.
 
     """
-    
-    document_store = InMemoryDocumentStore()
-    document_store.write_documents(documents)
+    if 'document_store' in st.session_state:
+        document_store = st.session_state['document_store']
+        temp  = document_store.get_all_documents()
+        if st.session_state('filename') != temp[0].meta['name']:
 
-    embedding_model = config.get('semantic_search','RETRIEVER')
-    embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
-    embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
-    retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
-    
+            document_store = InMemoryDocumentStore()
+            document_store.write_documents(documents)
 
-    
-    querycheck = QueryCheck()
-    retriever = EmbeddingRetriever(
+            embedding_model = config.get('semantic_search','RETRIEVER')
+            embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+            embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+            retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+            retriever = EmbeddingRetriever(
                 document_store=document_store,
                 embedding_model=embedding_model,top_k = retriever_top_k,
                 emb_extraction_layer=embedding_layer, scale_score =True,
                 model_format=embedding_model_format, use_gpu = True)
-    document_store.update_embeddings(retriever)
+            document_store.update_embeddings(retriever)
+        else:
+
+            retriever = EmbeddingRetriever(
+                document_store=document_store,
+                embedding_model=embedding_model,top_k = retriever_top_k,
+                emb_extraction_layer=embedding_layer, scale_score =True,
+                model_format=embedding_model_format, use_gpu = True)
+
+    else:
+        document_store = InMemoryDocumentStore()
+        document_store.write_documents(documents)
+
+        embedding_model = config.get('semantic_search','RETRIEVER')
+        embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+        embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+        retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+        retriever = EmbeddingRetriever(
+            document_store=document_store,
+            embedding_model=embedding_model,top_k = retriever_top_k,
+            emb_extraction_layer=embedding_layer, scale_score =True,
+            model_format=embedding_model_format, use_gpu = True)
+        document_store.update_embeddings(retriever)
+        st.session_state['document_store'] = document_store
+
+    querycheck = QueryCheck()
+    
     reader_model = config.get('semantic_search','READER')
     reader_top_k = retriever_top_k
     reader = FARMReader(model_name_or_path=reader_model,
@@ -150,7 +176,7 @@ def semanticsearchAnnotator(matches: List[List[int]], document):
         end_idx = match[1]
         annotated_text = (annotated_text + document[start:start_idx]
                           + str(annotation(body=document[start_idx:end_idx],
-                         label="ANSWER", background="#964448", color='#ffffff')))
+                         label="CONTEXT", background="#964448", color='#ffffff')))
         start = end_idx
     
     annotated_text = annotated_text + document[end_idx:]
