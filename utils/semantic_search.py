@@ -103,7 +103,7 @@ def semanticSearchPipeline(documents:List[Document]):
     if 'document_store' in st.session_state:
         document_store = st.session_state['document_store']
         temp  = document_store.get_all_documents()
-        if st.session_state('filename') != temp[0].meta['name']:
+        if st.session_state['filename'] != temp[0].meta['name']:
 
             document_store = InMemoryDocumentStore()
             document_store.write_documents(documents)
