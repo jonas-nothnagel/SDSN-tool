@@ -154,7 +154,7 @@ def semantic_search(query:Text,documents:List[Document],show_answers = False):
     else:
         
         for answer in results['answers']:
-            st.write(answer)
+            # st.write(answer)
             # matches = []
             # doc = []
             if answer.score >0.01:
