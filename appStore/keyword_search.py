@@ -87,6 +87,6 @@ def app():
                         paraList = runSemanticPreprocessingPipeline()
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
-                            semantic_search(queryList,paraList,show_answers=True)
+                            semantic_search(queryList,paraList)
 
                     
