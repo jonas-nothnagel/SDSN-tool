@@ -14,9 +14,9 @@ import docx
 from docx.shared import Inches
 from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
-from utils.sdg_classifier import sdg_classification
+from utils.sdg_classifier import sdg_classification, check_streamlit
 from utils.sdg_classifier import runSDGPreprocessingPipeline
-from utils.streamlitcheck import check_streamlit
+# from utils.streamlitcheck import check_streamlit
 import tempfile
 import sqlite3
 import logging
