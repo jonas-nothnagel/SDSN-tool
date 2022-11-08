@@ -38,38 +38,44 @@ def app():
 
 
     with st.container():
+        if st.button("RUN SDG Analysis"):
        
             
-        if 'filepath' in st.session_state:
-            allDocuments = runSDGPreprocessingPipeline(st.session_state['filepath'],
-                                                        st.session_state['filename'])
-            if len(allDocuments['documents']) > 100:
-                warning_msg = ": This might take sometime, please sit back and relax."
+            if 'filepath' in st.session_state:
+                allDocuments = runSDGPreprocessingPipeline(st.session_state['filepath'],
+                                                            st.session_state['filename'])
+                if len(allDocuments['documents']) > 100:
+                    warning_msg = ": This might take sometime, please sit back and relax."
+                else:
+                    warning_msg = ""
+
+                with st.spinner("Running SDG Classification{}".format(warning_msg)):
+
+                    df, x = sdg_classification(allDocuments['documents'])
+
+                    plt.rcParams['font.size'] = 25
+                    colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
+                    # plot
+                    fig, ax = plt.subplots()
+                    ax.pie(x, colors=colors, radius=2, center=(4, 4),
+                        wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
+                        frame=False,labels =list(x.index))
+                    # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
+                    st.markdown("#### Anything related to SDGs? ####")
+
+                    c4, c5, c6 = st.columns([2, 2, 2])
+
+                    with c5:
+                        st.pyplot(fig)
+                        
+                    c7, c8, c9 = st.columns([1, 10, 1])
+                    with c8:
+                        st.table(df)
             else:
-                warning_msg = ""
+                st.info("🤔 No document found, please try to upload it at the sidebar!")
+                logging.warning("Terminated as no document provided")
 
-            with st.spinner("Running SDG Classification{}".format(warning_msg)):
 
-                df, x = sdg_classification(allDocuments['documents'])
-
-                plt.rcParams['font.size'] = 25
-                colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
-                # plot
-                fig, ax = plt.subplots()
-                ax.pie(x, colors=colors, radius=2, center=(4, 4),
-                    wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
-                    frame=False,labels =list(x.index))
-                # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
-                st.markdown("#### Anything related to SDGs? ####")
-
-                c4, c5, c6 = st.columns([2, 2, 2])
-
-                with c5:
-                    st.pyplot(fig)
-                    
-                c7, c8, c9 = st.columns([1, 10, 1])
-                with c8:
-                    st.table(df)
 
 
 #     1. Keyword heatmap \n

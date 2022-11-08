@@ -17,7 +17,7 @@ except Exception:
     st.info("Please place the paramconfig file in the same directory as app.py")
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def load_sdgClassifier():
     """
     loads the document classifier using haystack, where the name/path of model
@@ -36,7 +36,7 @@ def load_sdgClassifier():
 
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
