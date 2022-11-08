@@ -151,7 +151,7 @@ def runRegexMatcher(token_list:List[str], document:Text):
     
     return matches, document
 
-def spacyAnnotator(matches: List[List[int]], document:spacy.token.doc.Doc):
+def spacyAnnotator(matches: List[List[int]], document:spacy.tokens.doc.Doc):
     """
     This is spacy Annotator and needs spacy.doc
     Annotates the text in the document defined by list of [start index, end index]
