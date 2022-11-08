@@ -3,7 +3,6 @@ from haystack.document_stores import InMemoryDocumentStore
 import spacy
 import re
 from spacy.matcher import Matcher
-from termcolor import colored
 import streamlit as st
 from markdown import markdown
 from annotated_text import annotation
@@ -13,9 +12,14 @@ from utils.preprocessing import processingpipeline
 from utils.streamlitcheck import check_streamlit
 import configparser
 import logging
+try:
+    from termcolor import colored
+except:
+    pass
 
 try:
     import streamlit as st
+    
 except ImportError:
     logging.info("Streamlit not installed")
 config = configparser.ConfigParser()
