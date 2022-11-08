@@ -56,7 +56,7 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     the number of times it is covered/discussed/count_of_paragraphs. 
 
     """
-    logging.info("running SDG classifiication")
+    logging.info("Working on SDG Classification")
     threshold = float(config.get('sdg','THRESHOLD'))
 
     
@@ -83,7 +83,7 @@ def runSDGPreprocessingPipeline(file_path, file_name)->List[Document]:
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
 
-    Param
+    Params
     ------------
 
     file_name: filename, in case of streamlit application use 

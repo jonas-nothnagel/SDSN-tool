@@ -47,12 +47,9 @@ def app():
         else:
             keywordList = None
         
-        searchtype = st.selectbox("Do you want to find exact macthes or similar meaning/context",
+        searchtype = st.selectbox("Do you want to find exact macthes or similar \
+                                    meaning/context",
                                  ['Exact Matches', 'Similar context/meaning'])
-        # if searchtype == 'Similar context/meaning':
-        #     show_answers = st.sidebar.checkbox("Show context")
-
-
 
     
     with st.container():
@@ -61,33 +58,38 @@ def app():
                         will look for these keywords in document".format(genre),
                                     value="{}".format(keywordList))
         else:
-            queryList = st.text_input("Please enter here your question and we will look \
-                                        for an answer in the document OR enter the keyword you \
-                                        are looking for and we will \
-                                        we will look for similar context \
-                                        in the document.",
+            queryList = st.text_input("Please enter here your question and we \
+                                        will look for an answer in the document\
+                                        OR enter the keyword you are looking \
+                                        for and we will we will look for similar\
+                                        context in the document.",
                                     placeholder="Enter keyword here")
         
         if st.button("Find them"):
 
             if queryList == "":
-                st.info("🤔 No keyword provided, if you dont have any, please try example sets from sidebar!")
+                st.info("🤔 No keyword provided, if you dont have any, \
+                                please try example sets from sidebar!")
                 logging.warning("Terminated as no keyword provided")
             else:
                 if 'filepath' in st.session_state:
                     
+                    
                     if searchtype == 'Exact Matches':
-                        paraList = runLexicalPreprocessingPipeline()
+                        allDocuments = runLexicalPreprocessingPipeline(
+                                            st.session_state['filepath'],
+                                            st.session_state['filename'])
                         logging.info("performing lexical search")
-                        with st.spinner("Performing Exact matching search (Lexical search) for you"):
+                        with st.spinner("Performing Exact matching search \
+                                        (Lexical search) for you"):
                             st.markdown("##### Top few lexical search (TFIDF) hits #####")
-                            lexical_search(queryList,paraList)
+                            lexical_search(queryList,allDocuments['documents'])
                     else:
-                        
-                        paraList = runSemanticPreprocessingPipeline()
-                        logging.info("starting semantic search")
-                        with st.spinner("Performing Similar/Contextual search"):
-                            semantic_search(queryList,paraList)
+                        pass
+                        # paraList = runSemanticPreprocessingPipeline()
+                        # logging.info("starting semantic search")
+                        # with st.spinner("Performing Similar/Contextual search"):
+                        #     semantic_search(queryList,paraList)
 
                 else:
                     st.info("🤔 No document found, please try to upload it at the sidebar!")
