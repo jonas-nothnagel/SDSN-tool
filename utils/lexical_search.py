@@ -18,15 +18,14 @@ except:
     pass
 
 try:
-    import streamlit as st
-    
+    import streamlit as st    
 except ImportError:
     logging.info("Streamlit not installed")
 config = configparser.ConfigParser()
 try:
     config.read_file(open('paramconfig.cfg'))
 except Exception:
-    logging.info("paramconfig file not found")
+    logging.warning("paramconfig file not found")
     st.info("Please place the paramconfig file in the same directory as app.py")
 
 

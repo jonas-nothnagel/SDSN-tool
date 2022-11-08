@@ -3,20 +3,41 @@ from haystack.nodes import EmbeddingRetriever, FARMReader
 from haystack.nodes.base import BaseComponent
 from haystack.document_stores import InMemoryDocumentStore
 import configparser
-import streamlit as st
 from markdown import markdown
 from annotated_text import annotation
 from haystack.schema import Document
 from typing import List, Text
 from utils.preprocessing import processingpipeline
+from utils.streamlitcheck import check_streamlit
 from haystack.pipelines import Pipeline
-
+import logging
+try:
+    from termcolor import colored
+except:
+    pass
+try:
+    import streamlit as st    
+except ImportError:
+    logging.info("Streamlit not installed")
 config = configparser.ConfigParser()
-config.read_file(open('paramconfig.cfg'))
+try:
+    config.read_file(open('paramconfig.cfg'))
+except Exception:
+    logging.info("paramconfig file not found")
+    st.info("Please place the paramconfig file in the same directory as app.py")
+
+
+@st.cache(allow_output_mutation=True)
+def loadQueryClassifier():
+    query_classifier = TransformersQueryClassifier(model_name_or_path=
+                            "shahrukhx01/bert-mini-finetune-question-detection")
+    return query_classifier
 
 class QueryCheck(BaseComponent):
     """
     Uses Query Classifier from Haystack, process the query based on query type
+    1. https://docs.haystack.deepset.ai/docs/query_classifier
+
     """
 
     outgoing_edges = 1
@@ -28,11 +49,7 @@ class QueryCheck(BaseComponent):
         useful for sentence transoformers.
         
         """
-
-        query_classifier =  TransformersQueryClassifier(model_name_or_path=
-                            "shahrukhx01/bert-mini-finetune-question-detection")
-
-        
+        query_classifier = loadQueryClassifier()
         result = query_classifier.run(query=query)
 
         if result[1] == "output_1":
@@ -46,10 +63,19 @@ class QueryCheck(BaseComponent):
     def run_batch(self, query):
         pass
 
-def runSemanticPreprocessingPipeline()->List[Document]:
+
+def runSemanticPreprocessingPipeline(file_path, file_name)->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
+
+    Params
+    ------------
+
+    file_name: filename, in case of streamlit application use 
+    st.session_state['filename']
+    file_path: filepath, in case of streamlit application use 
+    st.session_state['filepath']
 
     Return
     --------------
@@ -59,8 +85,7 @@ def runSemanticPreprocessingPipeline()->List[Document]:
     key = 'documents' on output.
 
     """
-    file_path = st.session_state['filepath']
-    file_name = st.session_state['filename']
+
     semantic_processing_pipeline = processingpipeline()
     split_by = config.get('semantic_search','SPLIT_BY')
     split_length = int(config.get('semantic_search','SPLIT_LENGTH'))
@@ -74,9 +99,48 @@ def runSemanticPreprocessingPipeline()->List[Document]:
                                             "split_length":split_length,\
                                             "split_overlap": split_overlap}})
 
-    return output_semantic_pre['documents']
+    return output_semantic_pre
 
 
+@st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
+def loadRetriever(embedding_model =  None, embedding_model_format = None, 
+                 embedding_layer = None,  retriever_top_k = 10, document_store = None):
+    logging.info("loading retriever")
+    if document_store is None:
+        logging.warning("Retriever initialization requires the DocumentStore")
+        return
+
+
+    if embedding_model is None:
+        try:   
+            embedding_model = config.get('semantic_search','RETRIEVER')
+            embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+            embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+            retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+        except Exception as e:
+            logging.info(e)
+            st.info(e)
+    
+    retriever = EmbeddingRetriever(
+                embedding_model=embedding_model,top_k = retriever_top_k,
+                document_store = document_store,
+                emb_extraction_layer=embedding_layer, scale_score =True,
+                model_format=embedding_model_format, use_gpu = True)
+    st.session_state['retriever'] = retriever
+    return retriever
+
+@st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
+def createDocumentStore(documents:List[Document], similarity:str = 'cosine'):
+    document_store = InMemoryDocumentStore(similarity = similarity)
+    document_store.write_documents(documents)
+    if 'retriever' in st.session_state:
+        retriever = st.session_state['retriever']
+        document_store.update_embeddings(retriever)
+    
+    return document_store
+
+
+@st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
 def semanticSearchPipeline(documents:List[Document]):
     """
     creates the semantic search pipeline and document Store object from the
@@ -100,72 +164,18 @@ def semanticSearchPipeline(documents:List[Document]):
     list of document returned by preprocessing pipeline.
 
     """
-    if 'document_store' in st.session_state:
-        document_store = st.session_state['document_store']
-        temp  = document_store.get_all_documents()
-        if st.session_state['filename'] != temp[0].meta['name']:
-
-            document_store = InMemoryDocumentStore()
-            document_store.write_documents(documents)
-            if 'retriever' in st.session_state:
-                retriever = st.session_state['retriever']
-                document_store.update_embeddings(retriever)
-                # querycheck = 
-
-
-            # embedding_model = config.get('semantic_search','RETRIEVER')
-            # embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
-            # embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
-            # retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
-            # retriever = EmbeddingRetriever(
-            #     document_store=document_store,
-            #     embedding_model=embedding_model,top_k = retriever_top_k,
-            #     emb_extraction_layer=embedding_layer, scale_score =True,
-            #     model_format=embedding_model_format, use_gpu = True)
-            # document_store.update_embeddings(retriever)
-        else:
-            embedding_model = config.get('semantic_search','RETRIEVER')
-            embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
-            retriever = EmbeddingRetriever(
-                document_store=document_store,
-                embedding_model=embedding_model,top_k = retriever_top_k,
-                emb_extraction_layer=embedding_layer, scale_score =True,
-                model_format=embedding_model_format, use_gpu = True)
-
+    document_store = createDocumentStore(documents)
+    retriever = loadRetriever(document_store=document_store)
+    document_store.update_embeddings(retriever)
+    querycheck = QueryCheck()
+    if 'reader' in st.session_state:
+        reader = st.session_state['reader']
     else:
-        document_store = InMemoryDocumentStore()
-        document_store.write_documents(documents)
-
-        embedding_model = config.get('semantic_search','RETRIEVER')
-        embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
-        embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
-        retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
-        
-        
-        retriever = EmbeddingRetriever(
-            document_store=document_store,
-            embedding_model=embedding_model,top_k = retriever_top_k,
-            emb_extraction_layer=embedding_layer, scale_score =True,
-            model_format=embedding_model_format, use_gpu = True)
-        st.session_state['retriever'] = retriever
-        document_store.update_embeddings(retriever)
-        st.session_state['document_store'] = document_store
-        querycheck = QueryCheck()
-        st.session_state['querycheck'] = querycheck
         reader_model = config.get('semantic_search','READER')
-        reader_top_k = retriever_top_k
+        reader_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
         reader = FARMReader(model_name_or_path=reader_model,
                         top_k = reader_top_k, use_gpu=True)
-        
         st.session_state['reader'] = reader
-
-    querycheck = QueryCheck()
-    
-    reader_model = config.get('semantic_search','READER')
-    reader_top_k = retriever_top_k
-    reader = FARMReader(model_name_or_path=reader_model,
-                    top_k = reader_top_k, use_gpu=True)
-    
 
     semanticsearch_pipeline = Pipeline()
     semanticsearch_pipeline.add_node(component = querycheck, name = "QueryCheck",
@@ -174,8 +184,87 @@ def semanticSearchPipeline(documents:List[Document]):
                                     inputs = ["QueryCheck.output_1"])
     semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
                                     inputs= ["EmbeddingRetriever"])
-    
+
     return semanticsearch_pipeline, document_store
+
+
+
+    # if 'document_store' in st.session_state:
+    #     document_store = st.session_state['document_store']
+    #     temp  = document_store.get_all_documents()
+    #     if st.session_state['filename'] != temp[0].meta['name']:
+
+    #         document_store = InMemoryDocumentStore()
+    #         document_store.write_documents(documents)
+    #         if 'retriever' in st.session_state:
+    #             retriever = st.session_state['retriever']
+    #             document_store.update_embeddings(retriever)
+    #             # querycheck = 
+
+
+    #         # embedding_model = config.get('semantic_search','RETRIEVER')
+    #         # embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+    #         # embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+    #         # retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+    #         # retriever = EmbeddingRetriever(
+    #         #     document_store=document_store,
+    #         #     embedding_model=embedding_model,top_k = retriever_top_k,
+    #         #     emb_extraction_layer=embedding_layer, scale_score =True,
+    #         #     model_format=embedding_model_format, use_gpu = True)
+    #         # document_store.update_embeddings(retriever)
+    #     else:
+    #         embedding_model = config.get('semantic_search','RETRIEVER')
+    #         embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+    #         retriever = EmbeddingRetriever(
+    #             document_store=document_store,
+    #             embedding_model=embedding_model,top_k = retriever_top_k,
+    #             emb_extraction_layer=embedding_layer, scale_score =True,
+    #             model_format=embedding_model_format, use_gpu = True)
+
+    # else:
+    #     document_store = InMemoryDocumentStore()
+    #     document_store.write_documents(documents)
+
+    #     embedding_model = config.get('semantic_search','RETRIEVER')
+    #     embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+    #     embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+    #     retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+        
+        
+    #     retriever = EmbeddingRetriever(
+    #         document_store=document_store,
+    #         embedding_model=embedding_model,top_k = retriever_top_k,
+    #         emb_extraction_layer=embedding_layer, scale_score =True,
+    #         model_format=embedding_model_format, use_gpu = True)
+    #     st.session_state['retriever'] = retriever
+    #     document_store.update_embeddings(retriever)
+    #     st.session_state['document_store'] = document_store
+    #     querycheck = QueryCheck()
+    #     st.session_state['querycheck'] = querycheck
+    #     reader_model = config.get('semantic_search','READER')
+    #     reader_top_k = retriever_top_k
+    #     reader = FARMReader(model_name_or_path=reader_model,
+    #                     top_k = reader_top_k, use_gpu=True)
+        
+    #     st.session_state['reader'] = reader
+
+    # querycheck = QueryCheck()
+    
+    # reader_model = config.get('semantic_search','READER')
+    # reader_top_k = retriever_top_k
+    # reader = FARMReader(model_name_or_path=reader_model,
+    #                 top_k = reader_top_k, use_gpu=True)
+    
+
+    # semanticsearch_pipeline = Pipeline()
+    # semanticsearch_pipeline.add_node(component = querycheck, name = "QueryCheck",
+    #                                 inputs = ["Query"])
+    # semanticsearch_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
+    #                                 inputs = ["QueryCheck.output_1"])
+    # semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
+    #                                 inputs= ["EmbeddingRetriever"])
+    
+    # return semanticsearch_pipeline, document_store
 
 def semanticsearchAnnotator(matches: List[List[int]], document):
     """
@@ -191,18 +280,27 @@ def semanticsearchAnnotator(matches: List[List[int]], document):
     for match in matches:
         start_idx = match[0]
         end_idx = match[1]
-        annotated_text = (annotated_text + document[start:start_idx]
-                          + str(annotation(body=document[start_idx:end_idx],
-                         label="CONTEXT", background="#964448", color='#ffffff')))
+        if check_streamlit():
+            annotated_text = (annotated_text + document[start:start_idx]
+                            + str(annotation(body=document[start_idx:end_idx],
+                            label="ANSWER", background="#964448", color='#ffffff')))
+        else:
+            annotated_text = (annotated_text + document[start:start_idx]
+                            + colored(document[start_idx:end_idx],
+                          "green", attrs = ['bold']))
         start = end_idx
     
     annotated_text = annotated_text + document[end_idx:]
-    
-    st.write(
-            markdown(annotated_text),
-            unsafe_allow_html=True,
-        )
 
+    if check_streamlit():
+
+        st.write(
+                markdown(annotated_text),
+                unsafe_allow_html=True,
+            )
+    else:
+        print(annotated_text)
+    
 
 def semantic_search(query:Text,documents:List[Document]):
     """

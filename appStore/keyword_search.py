@@ -85,11 +85,13 @@ def app():
                             st.markdown("##### Top few lexical search (TFIDF) hits #####")
                             lexical_search(queryList,allDocuments['documents'])
                     else:
-                        pass
-                        # paraList = runSemanticPreprocessingPipeline()
-                        # logging.info("starting semantic search")
-                        # with st.spinner("Performing Similar/Contextual search"):
-                        #     semantic_search(queryList,paraList)
+                        allDocuments = runSemanticPreprocessingPipeline(
+                                            st.session_state['filepath'],
+                                            st.session_state['filename'])
+                        
+                        logging.info("starting semantic search")
+                        with st.spinner("Performing Similar/Contextual search"):
+                            semantic_search(queryList,allDocuments['documents'])
 
                 else:
                     st.info("🤔 No document found, please try to upload it at the sidebar!")
