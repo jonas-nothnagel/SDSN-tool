@@ -2,9 +2,6 @@
 import glob, os, sys; 
 sys.path.append('../utils')
 
-#import helper
-
-
 #import needed libraries
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -16,9 +13,6 @@ from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
 from utils.sdg_classifier import sdg_classification
 from utils.sdg_classifier import runSDGPreprocessingPipeline
-# from utils.streamlitcheck import check_streamlit
-import tempfile
-import sqlite3
 import logging
 logger = logging.getLogger(__name__)
 
@@ -47,15 +41,16 @@ def app():
        
             
         if 'filepath' in st.session_state:
-            paraList = runSDGPreprocessingPipeline()
-            if len(paraList) > 150:
+            allDocuments = runSDGPreprocessingPipeline(st.session_state['filepath'],
+                                                        st.session_state['filename'])
+            if len(allDocuments['documents']) > 100:
                 warning_msg = ": This might take sometime, please sit back and relax."
             else:
                 warning_msg = ""
 
             with st.spinner("Running SDG Classification{}".format(warning_msg)):
 
-                df, x = sdg_classification(paraList)
+                df, x = sdg_classification(allDocuments['documents'])
 
                 plt.rcParams['font.size'] = 25
                 colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))

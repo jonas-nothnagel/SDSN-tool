@@ -2,21 +2,28 @@ from haystack.nodes import TransformersDocumentClassifier
 from haystack.schema import Document
 from typing import List, Tuple
 import configparser
-import streamlit as st
-from utils.streamlitcheck import check_streamlit
-from pandas import DataFrame, Series
 import logging
+from pandas import DataFrame, Series
 from utils.preprocessing import processingpipeline
+try:
+    import streamlit as st
+except ImportError:
+    logging.info("Streamlit not installed")
 config = configparser.ConfigParser()
-config.read_file(open('paramconfig.cfg'))
+try:
+    config.read_file(open('paramconfig.cfg'))
+except Exception:
+    logging.info("paramconfig file not found")
+    st.info("Please place the paramconfig file in the same directory as app.py")
 
 
+@st.cache
 def load_sdgClassifier():
     """
     loads the document classifier using haystack, where the name/path of model
     in HF-hub as string is used to fetch the model object.
-     1. https://docs.haystack.deepset.ai/reference/document-classifier-api
-     2. https://docs.haystack.deepset.ai/docs/document_classifier
+    1. https://docs.haystack.deepset.ai/reference/document-classifier-api
+    2. https://docs.haystack.deepset.ai/docs/document_classifier
 
     Return: document classifier model
     """
@@ -28,6 +35,8 @@ def load_sdgClassifier():
     return doc_classifier
 
 
+
+@st.cache
 def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
@@ -50,16 +59,13 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     logging.info("running SDG classifiication")
     threshold = float(config.get('sdg','THRESHOLD'))
 
-    if check_streamlit():
-        st.write("caching model")
-        classifier = st.cache(load_sdgClassifier, allow_output_mutation=True)
-    else:
-        classifier = load_sdgClassifier()
+    
+    classifier = load_sdgClassifier()
     results = classifier.predict(haystackdoc)
 
 
     labels_= [(l.meta['classification']['label'],
-               l.meta['classification']['score'],l.content,) for l in results]
+            l.meta['classification']['score'],l.content,) for l in results]
 
     df = DataFrame(labels_, columns=["SDG","Relevancy","text"])
     
@@ -72,7 +78,7 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
 
     return df, x
 
-def runSDGPreprocessingPipeline(file_path = None, file_name = None)->List[Document]:
+def runSDGPreprocessingPipeline(file_path, file_name)->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
@@ -80,12 +86,12 @@ def runSDGPreprocessingPipeline(file_path = None, file_name = None)->List[Docume
     Param
     ------------
 
-    file_path: filepath, if not given will check for file_path in streamlit 
-    session_state, else will return 
+    file_name: filename, in case of streamlit application use 
+    st.session_state['filename']
+    file_path: filepath, in case of streamlit application use 
+    st.session_state['filepath']
 
-    file_name: filename, if not given will check for file_name in streamlit 
-    session_state
-    
+
     Return
     --------------
     List[Document]: When preprocessing pipeline is run, the output dictionary 
@@ -94,21 +100,20 @@ def runSDGPreprocessingPipeline(file_path = None, file_name = None)->List[Docume
     key = 'documents' on output.
 
     """
-    # if file_path:
-    file_path = st.session_state['filepath']
-    file_name = st.session_state['filename']
+
     sdg_processing_pipeline = processingpipeline()
     split_by = config.get('sdg','SPLIT_BY')
     split_length = int(config.get('sdg','SPLIT_LENGTH'))
     split_overlap = int(config.get('sdg','SPLIT_OVERLAP'))
+    remove_punc = bool(int(config.get('sdg','REMOVE_PUNC')))
 
 
     output_sdg_pre = sdg_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
-                                     "UdfPreProcessor": {"removePunc": False, \
+                                     "UdfPreProcessor": {"removePunc": remove_punc, \
                                             "split_by": split_by, \
                                             "split_length":split_length,\
                                             "split_overlap": split_overlap}})
     
-    return output_sdg_pre['documents']
+    return output_sdg_pre
