@@ -42,8 +42,9 @@ def app():
        
             
             if 'filepath' in st.session_state:
-                allDocuments = runSDGPreprocessingPipeline(st.session_state['filepath'],
-                                                            st.session_state['filename'])
+                file_name = st.session_state['filename']
+                file_path = st.session_state['filename']
+                allDocuments = runSDGPreprocessingPipeline(file_path,file_name)
                 if len(allDocuments['documents']) > 100:
                     warning_msg = ": This might take sometime, please sit back and relax."
                 else:
