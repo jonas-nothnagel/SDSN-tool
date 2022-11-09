@@ -18,9 +18,6 @@ def add_upload(choice):
                 bytes_data = uploaded_file.getvalue()
                 temp.write(bytes_data)
                 st.session_state['filename'] = uploaded_file.name
-                # file_name =  uploaded_file.name
-                # file_path = temp.name
-                # st.session_state['filename'] = file_name
                 st.session_state['filepath'] = temp.name
 
                 

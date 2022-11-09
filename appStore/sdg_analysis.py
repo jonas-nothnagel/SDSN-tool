@@ -6,6 +6,7 @@ sys.path.append('../utils')
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import streamlit as st
 import docx
 from docx.shared import Inches
@@ -13,6 +14,7 @@ from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
 from utils.sdg_classifier import sdg_classification
 from utils.sdg_classifier import runSDGPreprocessingPipeline
+from utils.keyword_extraction import keywordExtraction
 import logging
 logger = logging.getLogger(__name__)
 
@@ -53,6 +55,16 @@ def app():
                 with st.spinner("Running SDG Classification{}".format(warning_msg)):
 
                     df, x = sdg_classification(allDocuments['documents'])
+                    sdg_labels = df.SDG.unique()
+                    keywordList = []
+                    for label in sdg_labels:
+                        sdgdata = " ".join(df[df.SDG == label].text.to_list())
+                        list_ = keywordExtraction(label,[sdgdata])
+                        keywordList.append({'SDG':label, 'Keywords':list_})
+                    keywordsDf = pd.DataFrame(keywordList)
+                    
+
+
 
                     plt.rcParams['font.size'] = 25
                     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
@@ -62,12 +74,20 @@ def app():
                         wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
                         frame=False,labels =list(x.index))
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
+                    
+
                     st.markdown("#### Anything related to SDGs? ####")
 
                     c4, c5, c6 = st.columns([2, 2, 2])
 
                     with c5:
                         st.pyplot(fig)
+                    
+                    st.markdown("##### What keywords are present under SDG labels? #####")
+
+                    c1, c2, c3 = st.columns([1, 3, 1])
+                    with c2:
+                        st.table(keywordsDf)
                         
                     c7, c8, c9 = st.columns([1, 10, 1])
                     with c8:
