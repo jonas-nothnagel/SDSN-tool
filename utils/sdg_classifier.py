@@ -108,7 +108,7 @@ def runSDGPreprocessingPipeline(filePath, fileName)->List[Document]:
     remove_punc = bool(int(config.get('sdg','REMOVE_PUNC')))
 
 
-    output_sdg_pre = sdg_processing_pipeline.run(file_paths = file_path, 
+    output_sdg_pre = sdg_processing_pipeline.run(file_paths = filePath, 
                             params= {"FileConverter": {"file_path": filePath, \
                                         "file_name": fileName}, 
                                      "UdfPreProcessor": {"removePunc": remove_punc, \
