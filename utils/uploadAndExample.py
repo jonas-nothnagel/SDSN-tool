@@ -14,14 +14,14 @@ def add_upload(choice):
         uploaded_file = st.sidebar.file_uploader('Upload the File',
                             type=['pdf', 'docx', 'txt'])
         if uploaded_file is not None:
-            with tempfile.NamedTemporaryFile(mode="wb") as temp:
+            with tempfile.NamedTemporaryFile(mode="wb", delete = False) as temp:
                 bytes_data = uploaded_file.getvalue()
                 temp.write(bytes_data)
                 st.session_state['filename'] = uploaded_file.name
-                file_name =  uploaded_file.name
-                file_path = temp.name
-                st.session_state['filename'] = file_name
-                st.session_state['filepath'] = file_path
+                # file_name =  uploaded_file.name
+                # file_path = temp.name
+                # st.session_state['filename'] = file_name
+                st.session_state['filepath'] = temp.name
 
                 
 
