@@ -79,7 +79,7 @@ class FileConverter(BaseComponent):
             if file_name.endswith('.txt'):
                 converter = TextConverter(remove_numeric_tables=True)
             if file_name.endswith('.docx'):
-                converter = DocxToTextConverter(remove_numeric_tables=True) 
+                converter = DocxToTextConverter() 
         except Exception as e:
             logging.error(e)
             return 

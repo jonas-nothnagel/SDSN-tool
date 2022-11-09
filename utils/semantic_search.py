@@ -188,6 +188,66 @@ def semanticSearchPipeline(documents:List[Document]):
     return semanticsearch_pipeline, document_store
 
 
+def semanticsearchAnnotator(matches: List[List[int]], document):
+    """
+    Annotates the text in the document defined by list of [start index, end index]
+    Example: "How are you today", if document type is text, matches = [[0,3]]
+    will give answer = "How", however in case we used the spacy matcher then the
+    matches = [[0,3]] will give answer = "How are you". However if spacy is used
+    to find "How" then the matches = [[0,1]] for the string defined above.
+
+    """
+    start = 0
+    annotated_text = ""
+    for match in matches:
+        start_idx = match[0]
+        end_idx = match[1]
+        if check_streamlit():
+            annotated_text = (annotated_text + document[start:start_idx]
+                            + str(annotation(body=document[start_idx:end_idx],
+                            label="Context", background="#964448", color='#ffffff')))
+        else:
+            annotated_text = (annotated_text + document[start:start_idx]
+                            + colored(document[start_idx:end_idx],
+                          "green", attrs = ['bold']))
+        start = end_idx
+    
+    annotated_text = annotated_text + document[end_idx:]
+
+    if check_streamlit():
+
+        st.write(
+                markdown(annotated_text),
+                unsafe_allow_html=True,
+            )
+    else:
+        print(annotated_text)
+    
+
+def semantic_search(query:Text,documents:List[Document]):
+    """
+    Performs the Semantic search on the List of haystack documents which is 
+    returned by preprocessing Pipeline.
+
+    Params
+    -------
+    query: Keywords that need to be searche in documents.
+    documents: List fo Haystack documents returned by preprocessing pipeline.
+    
+    """
+    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents)
+    results = semanticsearch_pipeline.run(query = query)
+    st.markdown("##### Top few semantic search results #####")
+    for i,answer in enumerate(results['answers']):
+        temp = answer.to_dict()
+        start_idx = temp['offsets_in_document'][0]['start']
+        end_idx = temp['offsets_in_document'][0]['end']
+        match = [[start_idx,end_idx]]
+        doc = doc_store.get_document_by_id(temp['document_id']).content
+        st.write("Result {}".format(i+1))
+        semanticsearchAnnotator(match, doc)
+
+
 
     # if 'document_store' in st.session_state:
     #     document_store = st.session_state['document_store']
@@ -265,62 +325,3 @@ def semanticSearchPipeline(documents:List[Document]):
     #                                 inputs= ["EmbeddingRetriever"])
     
     # return semanticsearch_pipeline, document_store
-
-def semanticsearchAnnotator(matches: List[List[int]], document):
-    """
-    Annotates the text in the document defined by list of [start index, end index]
-    Example: "How are you today", if document type is text, matches = [[0,3]]
-    will give answer = "How", however in case we used the spacy matcher then the
-    matches = [[0,3]] will give answer = "How are you". However if spacy is used
-    to find "How" then the matches = [[0,1]] for the string defined above.
-
-    """
-    start = 0
-    annotated_text = ""
-    for match in matches:
-        start_idx = match[0]
-        end_idx = match[1]
-        if check_streamlit():
-            annotated_text = (annotated_text + document[start:start_idx]
-                            + str(annotation(body=document[start_idx:end_idx],
-                            label="ANSWER", background="#964448", color='#ffffff')))
-        else:
-            annotated_text = (annotated_text + document[start:start_idx]
-                            + colored(document[start_idx:end_idx],
-                          "green", attrs = ['bold']))
-        start = end_idx
-    
-    annotated_text = annotated_text + document[end_idx:]
-
-    if check_streamlit():
-
-        st.write(
-                markdown(annotated_text),
-                unsafe_allow_html=True,
-            )
-    else:
-        print(annotated_text)
-    
-
-def semantic_search(query:Text,documents:List[Document]):
-    """
-    Performs the Semantic search on the List of haystack documents which is 
-    returned by preprocessing Pipeline.
-
-    Params
-    -------
-    query: Keywords that need to be searche in documents.
-    documents: List fo Haystack documents returned by preprocessing pipeline.
-    
-    """
-    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents)
-    results = semanticsearch_pipeline.run(query = query)
-    st.markdown("##### Top few semantic search results #####")
-    for i,answer in enumerate(results['answers']):
-        temp = answer.to_dict()
-        start_idx = temp['offsets_in_document'][0]['start']
-        end_idx = temp['offsets_in_document'][0]['end']
-        match = [[start_idx,end_idx]]
-        doc = doc_store.get_document_by_id(temp['document_id']).content
-        st.write("Result {}".format(i+1))
-        semanticsearchAnnotator(match, doc)
