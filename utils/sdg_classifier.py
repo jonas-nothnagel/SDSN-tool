@@ -78,7 +78,7 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
 
     return df, x
 
-def runSDGPreprocessingPipeline(file_path, file_name)->List[Document]:
+def runSDGPreprocessingPipeline(filePath, fileName)->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
@@ -109,8 +109,8 @@ def runSDGPreprocessingPipeline(file_path, file_name)->List[Document]:
 
 
     output_sdg_pre = sdg_processing_pipeline.run(file_paths = file_path, 
-                            params= {"FileConverter": {"file_path": file_path, \
-                                        "file_name": file_name}, 
+                            params= {"FileConverter": {"file_path": filePath, \
+                                        "file_name": fileName}, 
                                      "UdfPreProcessor": {"removePunc": remove_punc, \
                                             "split_by": split_by, \
                                             "split_length":split_length,\
