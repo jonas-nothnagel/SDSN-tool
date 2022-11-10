@@ -11,11 +11,12 @@ def app():
                       unsafe_allow_html=True)
 
     
-    st.markdown('<div style="text-align: center; \
-                    color: grey;">The Policy Action Tracker is an open-source\
+    st.markdown("<div style='text-align: center; \
+                    color: grey;'>The Policy Action Tracker is an open-source\
                          digital tool which aims to assist policy analysts and \
                           other users in extracting and filtering relevant \
-                            information from public documents. !</div>')
+                            information from public documents.</div>",
+                        unsafe_allow_html=True)
     footer = """
            <div class="footer-custom">
                Guidance & Feedback - <a href="https://www.linkedin.com/in/maren-bernlöhr-149891222" target="_blank">Maren Bernlöhr</a> |
