@@ -128,17 +128,6 @@ hr {
     margin: 2em 0 1em;
 }
 
-h1, h2, h3, h4, h5, h6, p {
-    line-height:150%;
-    padding:0;
-  }
-  
-h1, .alpha {   font-size: 30px; color:black;    margin:20px 0 15px 0; }
-h2, .beta {    font-size: 25px; color:#ccc;     margin:20px 0 5px 0; }
-h3, .gamma {   font-size: 20px; color:#333;     margin:20px 0 5px 0; }
-h4, .delta {   font-size: 18px; color:grey;     margin:20px 0 5px 0; }
-h5, .epsilon { font-size: 16px; color:#ccc;     margin:20px 0 5px 0; }
-h6, .zeta {    font-size: 14px; color:#f3f3f3;  margin:20px 0 5px 0; }
   
 .technical-details-info {
     margin-bottom: 100px;
