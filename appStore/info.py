@@ -41,7 +41,7 @@ The collaboration aims to determine the potential of NLP methods for tracking po
     <br>
     """
     st.markdown(intro, unsafe_allow_html=True)
-    st.image("appStore/img/pic1.png", caption="")
+    st.image("docStore/img/pic1.png", caption="")
     #st.subheader("Methodology")
     #st.write("Each sentence in the generated answer ends with a coloured tooltip; the colour ranges from red to green. "
     #         "The tooltip contains a value representing answer sentence similarity to a specific sentence in the "
