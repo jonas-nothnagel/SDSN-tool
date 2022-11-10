@@ -45,17 +45,14 @@ class MultiApp:
     def run(self):
         
         st.sidebar.write(format_func=lambda app: app['title'])
-        image = Image.open('docStore/img/giz_sdsn.jpg')
-        st.sidebar.image(image)
-        #st.sidebar.markdown("##  📌 Pages ")
-        #app = st.sidebar.radio(
-        #    'Pages',
-         #   self.apps,
-         #   from streamlit_option_menu import option_menu
+        image = Image.open('docStore/img/giz_sdsn_small.jpg')
+        st.sidebar.image(image, width =5)
+       
         with st.sidebar:
             selected = option_menu(None, [page["title"] for page in self.apps],
                                    icons=[page["icon"] for page in self.apps],
-                                   menu_icon="cast", default_index=0)          
+                                   menu_icon="cast", default_index=0)
+            st.markdown("---")          
         
         
         for index, item in enumerate(self.apps):
@@ -63,14 +60,11 @@ class MultiApp:
                 self.apps[index]["function"]()
                 break
                 
-        # app['function']()
+   
         choice = st.sidebar.radio(label = 'Select the Document',
                             help = 'You can upload the document \
                             or else you can try a example document', 
                             options = ('Upload Document', 'Try Example'), 
                             horizontal = True)
         add_upload(choice)
-        # st.sidebar.markdown('')
-        # st.sidebar.markdown(" :cloud: Upload document ")
-        # uploaded_file = st.sidebar.file_uploader('', type=['pdf', 'docx', 'txt']) #Upload PDF File
-        # st.session_state['file'] = uploaded_file
+       
