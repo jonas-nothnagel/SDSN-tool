@@ -1,12 +1,14 @@
 import streamlit as st
 
 def app():
-    st.markdown("<h1 style='text-align: center;  \
-                      color: black;'> Policy Action Tracker Manual</h1>", 
-                      unsafe_allow_html=True)
+    
     
     with open('style.css') as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
+    st.markdown("<h2 style='text-align: center;  \
+                      color: black;'> Policy Action Tracker Manual</h2>", 
+                      unsafe_allow_html=True)
     footer = """
            <div class="footer-custom">
                Guidance & Feedback - <a href="https://www.linkedin.com/in/maren-bernlöhr-149891222" target="_blank">Maren Bernlöhr</a> |
