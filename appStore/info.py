@@ -9,6 +9,13 @@ def app():
     st.markdown("<h2 style='text-align: center;  \
                       color: black;'> Policy Action Tracker Manual</h2>", 
                       unsafe_allow_html=True)
+
+    
+    st.markdown('<div style="text-align: center; \
+                    color: grey">The Policy Action Tracker is an open-source\
+                         digital tool which aims to assist policy analysts and \
+                          other users in extracting and filtering relevant \
+                            information from public documents. !</div>')
     footer = """
            <div class="footer-custom">
                Guidance & Feedback - <a href="https://www.linkedin.com/in/maren-bernlöhr-149891222" target="_blank">Maren Bernlöhr</a> |
@@ -20,9 +27,9 @@ def app():
            </div>
        """
     st.markdown(footer, unsafe_allow_html=True)
-
+    # <div class="text">
     intro = """
-    <div class="text">
+    <div style="text-align: justify;">
     The manual extraction of relevant information from text documents is a \
     time-consuming task for any policy analysts. As the amount and length of \
     public policy documents in relation to sustainable development (such as \
