@@ -42,7 +42,8 @@ def app():
     evaluation of stated goals and targets and their actual implementation on \
     the ground – arises. Luckily, Artificial Intelligence (AI) and Natural \
     Language Processing (NLP) methods can help in shortening and easing this \
-    task for policy analysts.</div>')
+    task for policy analysts.</div>',
+    unsafe_allow_html=True)
 
     intro = """
     <div style="text-align: justify;">
