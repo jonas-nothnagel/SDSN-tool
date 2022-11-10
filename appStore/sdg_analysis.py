@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def app():
 
     with st.container():
-        st.markdown("<h1 style='text-align: center; color: black;'> SDSN x GIZ Policy Action Tracking v0.1</h1>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; color: black;'> SDG Analysis on Polcy Document</h2>", unsafe_allow_html=True)
         st.write(' ')
         st.write(' ')
 
@@ -31,10 +31,11 @@ def app():
 
         st.write(
             """     
-            The *Analyse Policy Document* app is an easy-to-use interface built \
+            The *SDG Analysis on Polcy Document* app is an easy-to-use interface built \
                 in Streamlit for analyzing policy documents with respect to SDG \
-                 Classification for the paragraphs/texts in the document - \
-                developed by GIZ Data and the Sustainable Development Solution Network. \n
+                 Classification for the paragraphs/texts in the document and \
+                extracting the keyphrase per SDG label - developed by GIZ Data \
+                 and the Sustainable Development Solution Network. \n
             """)
         st.markdown("")
 

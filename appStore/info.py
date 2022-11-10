@@ -91,12 +91,3 @@ def app():
     """
     st.markdown(intro, unsafe_allow_html=True)
     st.image("docStore/img/pic1.png")
-    #st.subheader("Methodology")
-    #st.write("Each sentence in the generated answer ends with a coloured tooltip; the colour ranges from red to green. "
-    #         "The tooltip contains a value representing answer sentence similarity to a specific sentence in the "
-    #         "Wikipedia context passages retrieved.  Mouseover on the tooltip will show the sentence from the "
-    #         "Wikipedia context passage. If a sentence similarity is 1.0, the seq2seq model extracted and "
-    #         "copied the sentence verbatim from Wikipedia context passages. Lower values of sentence "
-    #         "similarity indicate the seq2seq model is struggling to generate a relevant sentence for the question "
-    #         "asked.")
-    #st.image("wikipedia_answer.png", caption="Answer with similarity tooltips")

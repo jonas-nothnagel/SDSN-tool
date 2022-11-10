@@ -51,6 +51,7 @@ def app():
                                     meaning/context",
                                  ['Exact Matches', 'Similar context/meaning'])
 
+        st.markdown("---")
     
     with st.container():
         if keywordList is not None:
