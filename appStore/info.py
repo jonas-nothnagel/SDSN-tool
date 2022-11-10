@@ -16,7 +16,8 @@ def app():
        """
     st.markdown(footer, unsafe_allow_html=True)
 
-    st.subheader("Policy Action Tracker Manual")
+    st.header("<h1 style='text-align: center;  \
+                      color: black;'> Policy Action Tracker Manual</h1>")
     intro = """
     <div class="text">
     The manual extraction of relevant information from text documents is a \

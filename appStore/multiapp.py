@@ -46,7 +46,7 @@ class MultiApp:
         
         st.sidebar.write(format_func=lambda app: app['title'])
         image = Image.open('docStore/img/giz_sdsn_small.jpg')
-        st.sidebar.image(image, width =100)
+        st.sidebar.image(image, width =150)
        
         with st.sidebar:
             selected = option_menu(None, [page["title"] for page in self.apps],
