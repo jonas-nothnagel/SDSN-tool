@@ -14,7 +14,7 @@ from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
 from utils.sdg_classifier import sdg_classification
 from utils.sdg_classifier import runSDGPreprocessingPipeline
-from utils.keyword_extraction import keywordExtraction
+from utils.keyword_extraction import keywordExtraction, textrank
 import logging
 logger = logging.getLogger(__name__)
 
@@ -59,9 +59,13 @@ def app():
                     keywordList = []
                     for label in sdg_labels:
                         sdgdata = " ".join(df[df.SDG == label].text.to_list())
-                        list_ = keywordExtraction(label,[sdgdata])
-                        keywordList.append({'SDG':label, 'Keywords':list_})
+                        tfidflist_ = keywordExtraction(label,[sdgdata])
+                        textranklist_ = textrank(sdgdata, words = 20)
+                        keywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_, 'TEXT RANK':textranklist_})
                     keywordsDf = pd.DataFrame(keywordList)
+
+
+
                     
 
 
@@ -83,11 +87,13 @@ def app():
                     with c5:
                         st.pyplot(fig)
                     
-                    st.markdown("##### What keywords are present under SDG labels? #####")
+                    st.markdown("##### What keywords are present under SDG classified text? #####")
+                    st.write("TFIDF BASED")
 
-                    c1, c2, c3 = st.columns([1, 3, 1])
+                    c1, c2, c3 = st.columns([1, 10, 1])
                     with c2:
                         st.table(keywordsDf)
+                    
                         
                     c7, c8, c9 = st.columns([1, 10, 1])
                     with c8:

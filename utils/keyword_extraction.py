@@ -7,6 +7,8 @@ import pickle
 from typing import List, Text
 import configparser
 import logging
+from summa import keywords
+
 try:
     from termcolor import colored
 except:
@@ -62,8 +64,12 @@ def keywordExtraction(sdg:int,sdgdata:List[Text]):
     keywords = [keyword for keyword in results]
     return keywords
 
+def textrank(textdata, ratio = 0.1, words = 0):
+    if words == 0:
+        results = keywords.keywords(textdata, ratio= ratio).split("\n")
+    else:
+        results = keywords.keywords(textdata, words= words).split("\n")
 
-
-    
+    return results
 
 
