@@ -29,7 +29,7 @@ def app():
        """
     st.markdown(footer, unsafe_allow_html=True)
     # <div class="text">
-    c1, c2, c3 =  st.columns([6,1,12])
+    c1, c2, c3 =  st.columns([8,1,12])
     with c1:
         st.image("docStore/img/ndc.png")
     with c3:
@@ -47,6 +47,7 @@ def app():
 
     intro = """
     <div style="text-align: justify;">
+
 
     For this purpose, the United Nations Sustainable Development Solutions \
     Network (SDSN) and the Deutsche Gesellschaft für Internationale \
