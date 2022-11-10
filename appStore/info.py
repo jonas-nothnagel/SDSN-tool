@@ -12,7 +12,7 @@ def app():
 
     
     st.markdown('<div style="text-align: center; \
-                    color: grey">The Policy Action Tracker is an open-source\
+                    color: grey;">The Policy Action Tracker is an open-source\
                          digital tool which aims to assist policy analysts and \
                           other users in extracting and filtering relevant \
                             information from public documents. !</div>')
