@@ -29,7 +29,7 @@ def app():
        """
     st.markdown(footer, unsafe_allow_html=True)
     # <div class="text">
-    c1, c2, c3 =  st.columns([6,1,10])
+    c1, c2, c3 =  st.columns([6,1,12])
     with c1:
         st.image("docStore/img/ndc.png")
     with c3:
@@ -47,15 +47,6 @@ def app():
 
     intro = """
     <div style="text-align: justify;">
-    The manual extraction of relevant information from text documents is a \
-    time-consuming task for any policy analysts. As the amount and length of \
-    public policy documents in relation to sustainable development (such as \
-    National Development Plans and Nationally Determined Contributions) \
-    continuously increases, a major challenge for policy action tracking – the \
-    evaluation of stated goals and targets and their actual implementation on \
-    the ground – arises. Luckily, Artificial Intelligence (AI) and Natural \
-    Language Processing (NLP) methods can help in shortening and easing this \
-    task for policy analysts.  
 
     For this purpose, the United Nations Sustainable Development Solutions \
     Network (SDSN) and the Deutsche Gesellschaft für Internationale \
@@ -98,7 +89,7 @@ def app():
     <br>
     """
     st.markdown(intro, unsafe_allow_html=True)
-    st.image("docStore/img/pic1.png", caption="")
+    st.image("docStore/img/pic1.png")
     #st.subheader("Methodology")
     #st.write("Each sentence in the generated answer ends with a coloured tooltip; the colour ranges from red to green. "
     #         "The tooltip contains a value representing answer sentence similarity to a specific sentence in the "
