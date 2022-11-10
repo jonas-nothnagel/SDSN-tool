@@ -56,17 +56,17 @@ def app():
 
                     df, x = sdg_classification(allDocuments['documents'])
                     sdg_labels = df.SDG.unique()
-                    keywordList = []
+                    tfidfkeywordList = []
+                    textrankkeywordlist = []
                     for label in sdg_labels:
                         sdgdata = " ".join(df[df.SDG == label].text.to_list())
                         tfidflist_ = keywordExtraction(label,[sdgdata])
                         textranklist_ = textrank(sdgdata, words = 20)
-                        keywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_, 'TEXT RANK':textranklist_})
-                    keywordsDf = pd.DataFrame(keywordList)
+                        tfidfkeywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_})
+                        textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':textranklist_})
+                    tfidfkeywordsDf = pd.DataFrame(tfidfkeywordList)
+                    tRkeywordsDf = pd.DataFrame(textrankkeywordlist)
 
-
-
-                    
 
 
 
@@ -92,9 +92,13 @@ def app():
 
                     c1, c2, c3 = st.columns([1, 10, 1])
                     with c2:
-                        st.table(keywordsDf)
-                    
-                        
+                        st.table(tfidfkeywordsDf)
+
+                    st.write("TextRank BASED")
+
+                    c11, c12, c13 = st.columns([1, 10, 1])
+                    with c12:
+                        st.table(tRkeywordsDf)    
                     c7, c8, c9 = st.columns([1, 10, 1])
                     with c8:
                         st.table(df)
