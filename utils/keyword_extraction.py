@@ -69,11 +69,14 @@ def textrank(textdata, ratio = 0.1, words = 0):
         try:
             words = int(config.get('sdg','TOP_KEY'))
             results = keywords.keywords(textdata, words = words).split("\n")    
-        except:
-            logging.warning("paramconfig not found, running textrank with ratio")
+        except Exception as e:
+            logging.warning(e)
             results = keywords.keywords(textdata, ratio= ratio).split("\n")
     else:
-        results = keywords.keywords(textdata, words= words).split("\n")
+        try:
+            results = keywords.keywords(textdata, words= words).split("\n")
+        except:
+            results = keywords.keywords(textdata, ratio = ratio).split("\n")
 
     return results
 

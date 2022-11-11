@@ -117,7 +117,7 @@ def app():
                         textranklist_ = textrank(sdgdata)
                         if len(textranklist_) > 0:
                         # tfidfkeywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_})
-                            textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':textranklist_})
+                            textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':",".join(textranklist_)})
                     # tfidfkeywordsDf = pd.DataFrame(tfidfkeywordList)
                     tRkeywordsDf = pd.DataFrame(textrankkeywordlist)
 
@@ -139,13 +139,14 @@ def app():
                     with c5:
                         st.pyplot(fig)
                     
-                    st.markdown("##### What keywords are present under SDG classified text? #####")
+                    st.markdown("###### What keywords are present under SDG classified text? ######")
 
-                    c1, c2, c3 = st.columns([1, 10, 1])
-                    with c2:
-                        st.table(tRkeywordsDf)
+                    # c1, c2, c3 = st.columns([1, 10, 1])
+                    # with c2:
+                    #     st.table(tRkeywordsDf)
+                    AgGrid(tRkeywordsDf, reload_data = False, update_mode="value_changed")
 
-                    st.markdown("##### Top few SDG Classified paragraph/text results #####")
+                    st.markdown("###### Top few SDG Classified paragraph/text results ######")
                     # c7, c8, c9 = st.columns([1, 10, 1])
                     # with c8:
                     AgGrid(df, reload_data = False, update_mode="value_changed")
