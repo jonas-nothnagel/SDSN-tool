@@ -44,8 +44,7 @@ def app():
             of a “context” and should limit the paragraph length deviation. \
             However, since we want to respect the sentence boundary the limit \
             can breach and hence this limit of 120 is tentative.  \n
-
-            SDG cLassification: The application assigns paragraphs to 15 of \
+            **SDG cLassification:** The application assigns paragraphs to 15 of \
             the 17 United Nations Sustainable Development Goals (SDGs). SDG 16 \
             “Peace, Justice and Strong Institutions” and SDG 17 \
             “Partnerships for the Goals” are excluded from the analysis due to \
@@ -62,8 +61,7 @@ def app():
             interested in the classification of research according to the \
             Sustainable Development Goals. The summary table only displays \
             paragraphs with a calculated relevancy score above 85%.  \n
-
-            Keyphrase Extraction: The application extracts 15 keyphrases from \
+            **Keyphrase Extraction:** The application extracts 15 keyphrases from \
             the document, calculates a respective relevancy score, and displays \
             the results in a summary table. The keyphrases are extracted using \
             using [Textrank](https://github.com/summanlp/textrank) which is an \
