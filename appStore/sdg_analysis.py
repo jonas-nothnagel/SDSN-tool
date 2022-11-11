@@ -37,13 +37,13 @@ def app():
                 extracting the keyphrase per SDG label - developed by GIZ Data \
                  and the Sustainable Development Solution Network. \n
             """)
-        st.write("""Document Processing: The Uploaded/Selected document is \
+        st.write("""**Document Processing:** The Uploaded/Selected document is \
             automatically cleaned and split into paragraphs with a maximum \
             length of 120 words using a Haystack preprocessing pipeline. The \
             length of 120 is an empirical value which should reflect the length \
             of a “context” and should limit the paragraph length deviation. \
             However, since we want to respect the sentence boundary the limit \
-            can breach and hence this limit of 120 is tentative.\n
+            can breach and hence this limit of 120 is tentative.  \n
 
             SDG cLassification: The application assigns paragraphs to 15 of \
             the 17 United Nations Sustainable Development Goals (SDGs). SDG 16 \
@@ -61,7 +61,7 @@ def app():
             partnerships and growing community of researchers and institutions \
             interested in the classification of research according to the \
             Sustainable Development Goals. The summary table only displays \
-            paragraphs with a calculated relevancy score above 85%.\n
+            paragraphs with a calculated relevancy score above 85%.  \n
 
             Keyphrase Extraction: The application extracts 15 keyphrases from \
             the document, calculates a respective relevancy score, and displays \
