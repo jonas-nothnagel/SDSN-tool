@@ -67,8 +67,8 @@ def keywordExtraction(sdg:int,sdgdata:List[Text]):
 def textrank(textdata, ratio = 0.1, words = 0):
     if words == 0:
         try:
-            words = config.get('sdg','TOP_KEY')
-            results = keywords.keywords(textdata, words = ratio).split("\n")    
+            words = int(config.get('sdg','TOP_KEY'))
+            results = keywords.keywords(textdata, words = words).split("\n")    
         except:
             logging.warning("paramconfig not found, running textrank with ratio")
             results = keywords.keywords(textdata, ratio= ratio).split("\n")

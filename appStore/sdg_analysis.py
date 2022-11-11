@@ -146,9 +146,9 @@ def app():
                         st.table(tRkeywordsDf)
 
                     st.markdown("##### Top few SDG Classified paragraph/text results #####")
-                    c7, c8, c9 = st.columns([1, 10, 1])
-                    with c8:
-                        AgGrid(df)
+                    # c7, c8, c9 = st.columns([1, 10, 1])
+                    # with c8:
+                    AgGrid(df)
             else:
                 st.info("🤔 No document found, please try to upload it at the sidebar!")
                 logging.warning("Terminated as no document provided")
