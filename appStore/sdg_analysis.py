@@ -126,7 +126,7 @@ def app():
                     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
                     # plot
                     fig, ax = plt.subplots()
-                    ax.pie(x.count, colors=colors, radius=3, center=(4, 4),
+                    ax.pie(x['count'], colors=colors, radius=3, center=(4, 4),
                         wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
                         frame=False,labels =list(x.SDG_name))
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
