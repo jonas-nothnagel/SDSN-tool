@@ -8,7 +8,6 @@ def add_upload(choice):
     the 'file' to streamlit session_state which then can be fetched later.
 
     """
-
     
     if choice == 'Upload Document':
         uploaded_file = st.sidebar.file_uploader('Upload the File',
@@ -21,7 +20,6 @@ def add_upload(choice):
                 st.session_state['filepath'] = temp.name
 
                 
-
     else:
         # listing the options
         option = st.sidebar.selectbox('Select the example document',

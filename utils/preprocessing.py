@@ -9,10 +9,6 @@ import logging
 import re
 import string
 from haystack.pipelines import Pipeline
-import configparser
-config = configparser.ConfigParser()
-config.read_file(open('paramconfig.cfg'))
-top_k = int(config.get('lexical_search','TOP_K'))
 
 def useOCR(file_path: str)-> Text:
     """
@@ -167,11 +163,10 @@ class UdfPreProcessor(BaseComponent):
 
     """
     outgoing_edges = 1
-    # split_overlap_word = int(config.get('preprocessor','SPLIT_OVERLAP_WORD'))
-    # split_overlap_sentence = int(config.get('preprocessor','SPLIT_OVERLAP_SENTENCE'))
 
     def run(self, documents:List[Document], removePunc:bool, 
             split_by: Literal["sentence", "word"] = 'sentence',
+            split_respect_sentence_boundary = False,
             split_length:int = 2, split_overlap = 0):
 
         """ this is required method to invoke the component in 
@@ -198,11 +193,9 @@ class UdfPreProcessor(BaseComponent):
         
         if split_by == 'sentence':
             split_respect_sentence_boundary = False
-            # split_overlap=self.split_overlap_sentence
     
         else:
-            split_respect_sentence_boundary = True
-            # split_overlap= self.split_overlap_word
+            split_respect_sentence_boundary = split_respect_sentence_boundary
       
         preprocessor = PreProcessor(
             clean_empty_lines=True,
@@ -218,6 +211,8 @@ class UdfPreProcessor(BaseComponent):
             )
         
         for i in documents:
+            # # basic cleaning before passing it to preprocessor.
+            # i = basic(i)
             docs_processed = preprocessor.process([i])
             for item in docs_processed:
                 item.content = basic(item.content, removePunc= removePunc)
@@ -243,7 +238,7 @@ class UdfPreProcessor(BaseComponent):
 def processingpipeline():
     """
     Returns the preprocessing pipeline. Will use FileConverter and UdfPreProcesor 
-    from utils.
+    from utils.preprocessing
 
     """
 

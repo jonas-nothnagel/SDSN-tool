@@ -28,7 +28,7 @@ def app():
            </div>
        """
     st.markdown(footer, unsafe_allow_html=True)
-    # <div class="text">
+
     c1, c2, c3 =  st.columns([8,1,12])
     with c1:
         st.image("docStore/img/ndc.png")
@@ -42,12 +42,11 @@ def app():
     evaluation of stated goals and targets and their actual implementation on \
     the ground – arises. Luckily, Artificial Intelligence (AI) and Natural \
     Language Processing (NLP) methods can help in shortening and easing this \
-    task for policy analysts.</div>',
+    task for policy analysts.</div><br>',
     unsafe_allow_html=True)
 
     intro = """
     <div style="text-align: justify;">
-
 
     For this purpose, the United Nations Sustainable Development Solutions \
     Network (SDSN) and the Deutsche Gesellschaft für Internationale \

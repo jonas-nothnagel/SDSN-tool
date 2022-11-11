@@ -106,7 +106,7 @@ def runSDGPreprocessingPipeline(filePath, fileName)->List[Document]:
     split_length = int(config.get('sdg','SPLIT_LENGTH'))
     split_overlap = int(config.get('sdg','SPLIT_OVERLAP'))
     remove_punc = bool(int(config.get('sdg','REMOVE_PUNC')))
-
+    split_respect_sentence_boundary = bool(int(config.get('sdg','RESPECT_SENTENCE_BOUNDARY')))
 
     output_sdg_pre = sdg_processing_pipeline.run(file_paths = filePath, 
                             params= {"FileConverter": {"file_path": filePath, \
@@ -114,6 +114,7 @@ def runSDGPreprocessingPipeline(filePath, fileName)->List[Document]:
                                      "UdfPreProcessor": {"removePunc": remove_punc, \
                                             "split_by": split_by, \
                                             "split_length":split_length,\
-                                            "split_overlap": split_overlap}})
+                                            "split_overlap": split_overlap, \
+        "split_respect_sentence_boundary":split_respect_sentence_boundary}})
     
     return output_sdg_pre

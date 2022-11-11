@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def app():
 
     with st.container():
-        st.markdown("<h2 style='text-align: center; color: black;'> SDG Analysis on Polcy Document</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; color: black;'> SDG Classification and Keyphrase Extraction </h2>", unsafe_allow_html=True)
         st.write(' ')
         st.write(' ')
 
@@ -31,11 +31,44 @@ def app():
 
         st.write(
             """     
-            The *SDG Analysis on Polcy Document* app is an easy-to-use interface built \
+            The *SDG Analysis* app is an easy-to-use interface built \
                 in Streamlit for analyzing policy documents with respect to SDG \
                  Classification for the paragraphs/texts in the document and \
                 extracting the keyphrase per SDG label - developed by GIZ Data \
                  and the Sustainable Development Solution Network. \n
+            """)
+        st.write("""Document Processing: The Uploaded/Selected document is \
+            automatically cleaned and split into paragraphs with a maximum \
+            length of 120 words using a Haystack preprocessing pipeline. The \
+            length of 120 is an empirical value which should reflect the length \
+            of a “context” and should limit the paragraph length deviation. \
+            However, since we want to respect the sentence boundary the limit \
+            can breach and hence this limit of 120 is tentative.\n
+
+            SDG cLassification: The application assigns paragraphs to 15 of \
+            the 17 United Nations Sustainable Development Goals (SDGs). SDG 16 \
+            “Peace, Justice and Strong Institutions” and SDG 17 \
+            “Partnerships for the Goals” are excluded from the analysis due to \
+            their broad nature which could potentially inflate the results. \
+            Each paragraph is assigned to one SDG only. Again, the results are \
+            displayed in a summary table including the number of the SDG, a \
+            relevancy score highlighted through a green color shading, and the \
+            respective text of the analyzed paragraph. Additionally, a pie \
+            chart with a blue color shading is displayed which illustrates the \
+            three most prominent SDGs in the document. The SDG classification \
+            uses open-source training [data](https://zenodo.org/record/5550238#.Y25ICHbMJPY) \
+            from [OSDG.ai](https://osdg.ai/) which is a global \
+            partnerships and growing community of researchers and institutions \
+            interested in the classification of research according to the \
+            Sustainable Development Goals. The summary table only displays \
+            paragraphs with a calculated relevancy score above 85%.\n
+
+            Keyphrase Extraction: The application extracts 15 keyphrases from \
+            the document, calculates a respective relevancy score, and displays \
+            the results in a summary table. The keyphrases are extracted using \
+            using [Textrank](https://github.com/summanlp/textrank) which is an \
+            easy-to-use computational less expensive \
+            model leveraging combination of TFIDF and Graph networks.
             """)
         st.markdown("")
 
@@ -57,18 +90,16 @@ def app():
 
                     df, x = sdg_classification(allDocuments['documents'])
                     sdg_labels = df.SDG.unique()
-                    tfidfkeywordList = []
+                    # tfidfkeywordList = []
                     textrankkeywordlist = []
                     for label in sdg_labels:
                         sdgdata = " ".join(df[df.SDG == label].text.to_list())
-                        tfidflist_ = keywordExtraction(label,[sdgdata])
+                        # tfidflist_ = keywordExtraction(label,[sdgdata])
                         textranklist_ = textrank(sdgdata, words = 20)
                         tfidfkeywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_})
                         textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':textranklist_})
                     tfidfkeywordsDf = pd.DataFrame(tfidfkeywordList)
                     tRkeywordsDf = pd.DataFrame(textrankkeywordlist)
-
-
 
 
                     plt.rcParams['font.size'] = 25
