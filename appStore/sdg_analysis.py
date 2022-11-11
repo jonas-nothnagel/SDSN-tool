@@ -12,6 +12,7 @@ import docx
 from docx.shared import Inches
 from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
+from st_aggrid import AgGrid
 from utils.sdg_classifier import sdg_classification
 from utils.sdg_classifier import runSDGPreprocessingPipeline
 from utils.keyword_extraction import keywordExtraction, textrank
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 def app():
 
+    #### APP INFO #####
     with st.container():
         st.markdown("<h2 style='text-align: center; color: black;'> SDG Classification and Keyphrase Extraction </h2>", unsafe_allow_html=True)
         st.write(' ')
@@ -72,7 +74,25 @@ def app():
             """)
         st.markdown("")
 
-
+    _lab_dict = {0: 'no_cat',
+                1:'SDG 1 - No poverty',
+                    2:'SDG 2 - Zero hunger',
+                    3:'SDG 3 - Good health and well-being',
+                    4:'SDG 4 - Quality education',
+                    5:'SDG 5 - Gender equality',
+                    6:'SDG 6 - Clean water and sanitation',
+                    7:'SDG 7 - Affordable and clean energy',
+                    8:'SDG 8 - Decent work and economic growth', 
+                    9:'SDG 9 - Industry, Innovation and Infrastructure',
+                    10:'SDG 10 - Reduced inequality',
+                11:'SDG 11 - Sustainable cities and communities',
+                12:'SDG 12 - Responsible consumption and production',
+                13:'SDG 13 - Climate action',
+                14:'SDG 14 - Life below water',
+                15:'SDG 15 - Life on land',
+                16:'SDG 16 - Peace, justice and strong institutions',
+                17:'SDG 17 - Partnership for the goals',}
+    
     with st.container():
         if st.button("RUN SDG Analysis"):
        
@@ -90,15 +110,15 @@ def app():
 
                     df, x = sdg_classification(allDocuments['documents'])
                     sdg_labels = df.SDG.unique()
-                    # tfidfkeywordList = []
                     textrankkeywordlist = []
                     for label in sdg_labels:
                         sdgdata = " ".join(df[df.SDG == label].text.to_list())
                         # tfidflist_ = keywordExtraction(label,[sdgdata])
-                        textranklist_ = textrank(sdgdata, words = 20)
-                        tfidfkeywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_})
-                        textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':textranklist_})
-                    tfidfkeywordsDf = pd.DataFrame(tfidfkeywordList)
+                        textranklist_ = textrank(sdgdata)
+                        if len(textranklist_) > 0:
+                        # tfidfkeywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_})
+                            textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':textranklist_})
+                    # tfidfkeywordsDf = pd.DataFrame(tfidfkeywordList)
                     tRkeywordsDf = pd.DataFrame(textrankkeywordlist)
 
 
@@ -106,9 +126,9 @@ def app():
                     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
                     # plot
                     fig, ax = plt.subplots()
-                    ax.pie(x, colors=colors, radius=2, center=(4, 4),
+                    ax.pie(x.count, colors=colors, radius=3, center=(4, 4),
                         wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
-                        frame=False,labels =list(x.index))
+                        frame=False,labels =list(x.SDG_name))
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                     
 
@@ -120,20 +140,15 @@ def app():
                         st.pyplot(fig)
                     
                     st.markdown("##### What keywords are present under SDG classified text? #####")
-                    st.write("TFIDF BASED")
 
                     c1, c2, c3 = st.columns([1, 10, 1])
                     with c2:
-                        st.table(tfidfkeywordsDf)
+                        st.table(tRkeywordsDf)
 
-                    st.write("TextRank BASED")
-
-                    c11, c12, c13 = st.columns([1, 10, 1])
-                    with c12:
-                        st.table(tRkeywordsDf)    
+                    st.markdown("##### Top few SDG Classified paragraph/text results #####")
                     c7, c8, c9 = st.columns([1, 10, 1])
                     with c8:
-                        st.table(df)
+                        AgGrid(df)
             else:
                 st.info("🤔 No document found, please try to upload it at the sidebar!")
                 logging.warning("Terminated as no document provided")

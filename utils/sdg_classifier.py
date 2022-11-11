@@ -3,6 +3,7 @@ from haystack.schema import Document
 from typing import List, Tuple
 import configparser
 import logging
+import pandas as pd
 from pandas import DataFrame, Series
 from utils.preprocessing import processingpipeline
 try:
@@ -16,6 +17,25 @@ except Exception:
     logging.info("paramconfig file not found")
     st.info("Please place the paramconfig file in the same directory as app.py")
 
+
+_lab_dict = {0: 'no_cat',
+                1:'SDG 1 - No poverty',
+                    2:'SDG 2 - Zero hunger',
+                    3:'SDG 3 - Good health and well-being',
+                    4:'SDG 4 - Quality education',
+                    5:'SDG 5 - Gender equality',
+                    6:'SDG 6 - Clean water and sanitation',
+                    7:'SDG 7 - Affordable and clean energy',
+                    8:'SDG 8 - Decent work and economic growth', 
+                    9:'SDG 9 - Industry, Innovation and Infrastructure',
+                    10:'SDG 10 - Reduced inequality',
+                11:'SDG 11 - Sustainable cities and communities',
+                12:'SDG 12 - Responsible consumption and production',
+                13:'SDG 13 - Climate action',
+                14:'SDG 14 - Life below water',
+                15:'SDG 15 - Life on land',
+                16:'SDG 16 - Peace, justice and strong institutions',
+                17:'SDG 17 - Partnership for the goals',}
 
 @st.cache(allow_output_mutation=True)
 def load_sdgClassifier():
@@ -73,6 +93,10 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     df.index += 1
     df =df[df['Relevancy']>threshold]
     x = df['SDG'].value_counts()
+    x = x.rename('count')
+    x = x.rename_axis('SDG').reset_index()
+    x["SDG"] = pd.to_numeric(x["SDG"])
+    x['SDG_name'] = x['SDG'].apply(lambda x: _lab_dict[x])
     df= df.drop(['Relevancy'], axis = 1)
     
 
