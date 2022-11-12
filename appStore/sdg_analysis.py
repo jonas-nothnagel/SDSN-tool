@@ -136,12 +136,14 @@ def app():
 
                     st.markdown("#### Anything related to SDGs? ####")
 
-                    c4, c5, c6 = st.columns([1,3,2])
+                    c4, c5, c6 = st.columns([1,2,2])
 
                     with c5:
                         st.pyplot(fig)
                     with c6:
-                        st.table(x[['SDG','SDG_name']].set_index('SDG', inplace = True))
+                        labeldf = x[['SDG','SDG_name']]
+                        labeldf = labeldf.set_index('SDG')
+                        st.table(labeldf)
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
