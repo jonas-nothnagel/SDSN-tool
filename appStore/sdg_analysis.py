@@ -129,16 +129,18 @@ def app():
                     fig, ax = plt.subplots()
                     ax.pie(x['count'], colors=colors, radius=2, center=(4, 4),
                         wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
-                        frame=False,labels =list(x.SDG_name))
+                        frame=False,labels =list(x.SDG))
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                     
 
                     st.markdown("#### Anything related to SDGs? ####")
 
-                    c4, c5, c6 = st.columns([2, 2, 2])
+                    c4, c5, c6 = st.columns([1, 5, 2])
 
                     with c5:
                         st.pyplot(fig)
+                    with c6:
+                        st.table(x[['SDG','SDG_name']])
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
@@ -147,7 +149,8 @@ def app():
                     #     st.table(tRkeywordsDf)
                     AgGrid(tRkeywordsDf, reload_data = False, 
                             update_mode="value_changed",
-                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS )
+                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS,
+                    height = 100 )
 
                     st.markdown("###### Top few SDG Classified paragraph/text results ######")
                     # c7, c8, c9 = st.columns([1, 10, 1])
