@@ -135,7 +135,7 @@ def app():
 
                     st.markdown("#### Anything related to SDGs? ####")
 
-                    c4, c5, c6 = st.columns([1, 3, 1])
+                    c4, c5, c6 = st.columns([1, 2, 1])
 
                     with c5:
                         st.pyplot(fig)
@@ -147,13 +147,13 @@ def app():
                     #     st.table(tRkeywordsDf)
                     AgGrid(tRkeywordsDf, reload_data = False, 
                             update_mode="value_changed",
-                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW )
+                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS )
 
                     st.markdown("###### Top few SDG Classified paragraph/text results ######")
                     # c7, c8, c9 = st.columns([1, 10, 1])
                     # with c8:
                     AgGrid(df, reload_data = False, update_mode="value_changed",
-                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW)
+                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS)
             else:
                 st.info("🤔 No document found, please try to upload it at the sidebar!")
                 logging.warning("Terminated as no document provided")
