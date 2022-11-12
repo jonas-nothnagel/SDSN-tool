@@ -13,6 +13,7 @@ from docx.shared import Inches
 from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
 from st_aggrid import AgGrid
+from st_aggrid.shared import ColumnsAutoSizeMode
 from utils.sdg_classifier import sdg_classification
 from utils.sdg_classifier import runSDGPreprocessingPipeline
 from utils.keyword_extraction import keywordExtraction, textrank
@@ -134,7 +135,7 @@ def app():
 
                     st.markdown("#### Anything related to SDGs? ####")
 
-                    c4, c5, c6 = st.columns([2, 2, 2])
+                    c4, c5, c6 = st.columns([1, 3, 1])
 
                     with c5:
                         st.pyplot(fig)
@@ -144,12 +145,15 @@ def app():
                     # c1, c2, c3 = st.columns([1, 10, 1])
                     # with c2:
                     #     st.table(tRkeywordsDf)
-                    AgGrid(tRkeywordsDf, reload_data = False, update_mode="value_changed")
+                    AgGrid(tRkeywordsDf, reload_data = False, 
+                            update_mode="value_changed",
+                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW )
 
                     st.markdown("###### Top few SDG Classified paragraph/text results ######")
                     # c7, c8, c9 = st.columns([1, 10, 1])
                     # with c8:
-                    AgGrid(df, reload_data = False, update_mode="value_changed")
+                    AgGrid(df, reload_data = False, update_mode="value_changed",
+                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW)
             else:
                 st.info("🤔 No document found, please try to upload it at the sidebar!")
                 logging.warning("Terminated as no document provided")
