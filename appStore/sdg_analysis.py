@@ -129,18 +129,19 @@ def app():
                     fig, ax = plt.subplots()
                     ax.pie(x['count'], colors=colors, radius=2, center=(4, 4),
                         wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
-                        frame=False,labels =list(x.SDG))
+                        frame=False,labels =list(x.SDG),
+                        labeldistance=1.2)
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                     
 
                     st.markdown("#### Anything related to SDGs? ####")
 
-                    c4, c5, c6 = st.columns([1, 5, 2])
+                    c4, c5, c6 = st.columns([1,3,2])
 
                     with c5:
                         st.pyplot(fig)
                     with c6:
-                        st.table(x[['SDG','SDG_name']])
+                        st.table(x[['SDG','SDG_name']].set_index('SDG', inplace = True))
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
