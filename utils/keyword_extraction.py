@@ -27,14 +27,31 @@ except Exception:
 
 
 def sort_coo(coo_matrix):
+    """
+    It takes Coordinate format scipy sparse matrix and extracts info from same.\
+    1. https://kavita-ganesan.com/python-keyword-extraction/#.Y2-TFHbMJPb
+    """
     tuples = zip(coo_matrix.col, coo_matrix.data)
     return sorted(tuples, key=lambda x: (x[1], x[0]), reverse=True)
 
-def extract_topn_from_vector(feature_names, sorted_items, topn=10):
-    """get the feature names and tf-idf score of top n items"""
+def extract_topn_from_vector(feature_names, sorted_items, top_n=10):
+    """get the feature names and tf-idf score of top n items
+    
+    Params
+    ---------
+    feature_names: list of words from vectorizer
+    sorted_items: tuple returned by sort_coo function defined in  \
+    keyword_extraction.py
+    topn: topn words to be extracted using tfidf
+
+    Return
+    ----------
+    results: top extracted keywords
+
+    """
     
     #use only topn items from vector
-    sorted_items = sorted_items[:topn]
+    sorted_items = sorted_items[:top_n]
     score_vals = []
     feature_vals = []
     
@@ -53,6 +70,20 @@ def extract_topn_from_vector(feature_names, sorted_items, topn=10):
     return results
 
 def keywordExtraction(sdg:int,sdgdata:List[Text]):
+    """
+    TFIDF based keywords extraction
+    
+    Params
+    ---------
+    sdg: which sdg tfidf model to be used
+    sdgdata: text data to which needs keyword extraction
+
+
+    Return
+    ----------
+    keywords: top extracted keywords
+
+    """
     model_path = "docStore/sdg{}/".format(sdg)
     vectorizer = pickle.load(open(model_path+'vectorizer.pkl', 'rb'))
     tfidfmodel = pickle.load(open(model_path+'tfidfmodel.pkl', 'rb'))
@@ -64,7 +95,21 @@ def keywordExtraction(sdg:int,sdgdata:List[Text]):
     keywords = [keyword for keyword in results]
     return keywords
 
-def textrank(textdata, ratio = 0.1, words = 0):
+def textrank(textdata:Text, ratio:float = 0.1, words = 0):
+    """
+    wrappper function to perform textrank, uses either ratio or wordcount to
+    extract top keywords limited by words or ratio.
+
+    Params
+    --------
+    textdata: text data to perform the textrank.
+    ratio: float to limit the number of keywords as proportion of total token \
+        in textdata
+    words: number of keywords to be extracted. Takes priority over ratio if \
+        Non zero. Howevr incase the pagerank returns lesser keywords than \
+        compared to fix value then ratio is used.
+    
+    """
     if words == 0:
         try:
             words = int(config.get('sdg','TOP_KEY'))

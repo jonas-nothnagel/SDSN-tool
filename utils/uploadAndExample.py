@@ -31,11 +31,3 @@ def add_upload(choice):
         file_name = file_path  = files[option]
         st.session_state['filename'] = file_name
         st.session_state['filepath'] = file_path
-        # if option is 'South Africa:Low Emission strategy':
-        #     file_name = file_path  = 'docStore/sample/South Africa_s Low Emission Development Strategy.txt'
-        #     st.session_state['filename'] = file_name
-        #     st.session_state['filepath'] = file_path
-        # else:
-        #     file_name = file_path =  'docStore/sample/Ethiopia_s_2021_10 Year Development Plan.txt'
-        #     st.session_state['filename'] = file_name
-        #     st.session_state['filepath'] = file_path
