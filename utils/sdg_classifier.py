@@ -99,6 +99,7 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     x['SDG_name'] = x['SDG'].apply(lambda x: _lab_dict[x])
     x['SDG'] = x['SDG'].apply(lambda x: "SDG "+str(x))
     df= df.drop(['Relevancy'], axis = 1)
+    df['SDG'] = pd.to_numeric(df['SDG'])
     
 
     return df, x

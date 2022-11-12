@@ -99,6 +99,7 @@ def textrank(textdata:Text, ratio:float = 0.1, words = 0):
     """
     wrappper function to perform textrank, uses either ratio or wordcount to
     extract top keywords limited by words or ratio.
+    1. https://github.com/summanlp/textrank/blob/master/summa/keywords.py
 
     Params
     --------
@@ -109,6 +110,9 @@ def textrank(textdata:Text, ratio:float = 0.1, words = 0):
         Non zero. Howevr incase the pagerank returns lesser keywords than \
         compared to fix value then ratio is used.
     
+    Return
+    --------
+    results: extracted keywords
     """
     if words == 0:
         try:
