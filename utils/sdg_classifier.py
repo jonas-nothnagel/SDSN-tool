@@ -96,10 +96,12 @@ def sdg_classification(haystackdoc:List[Document])->Tuple[DataFrame,Series]:
     x = x.rename('count')
     x = x.rename_axis('SDG').reset_index()
     x["SDG"] = pd.to_numeric(x["SDG"])
+    x = x.sort_values(by=['SDG'])
     x['SDG_name'] = x['SDG'].apply(lambda x: _lab_dict[x])
     x['SDG'] = x['SDG'].apply(lambda x: "SDG "+str(x))
     df= df.drop(['Relevancy'], axis = 1)
     df['SDG'] = pd.to_numeric(df['SDG'])
+    df = df.sort_values('SDG')
     
 
     return df, x
