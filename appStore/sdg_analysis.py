@@ -128,7 +128,9 @@ def app():
                     # plot
                     fig, ax = plt.subplots()
                     ax.pie(x['count'], colors=colors, radius=2, center=(4, 4),
-                        wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
+                        wedgeprops={"linewidth": 1, "edgecolor": "white"},
+                        textprops={'fontsize': 14},
+                        rotatelabels= True, 
                         frame=False,labels =list(x.SDG),
                         labeldistance=1.2)
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
