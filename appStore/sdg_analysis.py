@@ -108,7 +108,7 @@ def app():
                 with st.spinner("Running SDG Classification{}".format(warning_msg)):
 
                     df, x = sdg_classification(allDocuments['documents'])
-                    sdg_labels = df.SDG.unique()
+                    sdg_labels = x.count.unique()
                     textrankkeywordlist = []
                     for label in sdg_labels:
                         sdgdata = " ".join(df[df.SDG == label].text.to_list())
