@@ -131,7 +131,6 @@ def app():
                         wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
                         frame=False,labels =list(x.SDG),
                         labeldistance=1.2)
-                    fig.tight_layout()
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                     
 
@@ -142,9 +141,9 @@ def app():
                     with c5:
                         st.pyplot(fig)
                     with c6:
-                        labeldf = x['SDG_name']
-                        # labeldf = labeldf.set_index('SDG_NAME')
-                        st.write(labeldf.to_string(index=False))
+                        labeldf = x['SDG_name'].values.to_list()
+                        labeldf = " \n".join(labeldf)
+                        st.write(labeldf)
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
