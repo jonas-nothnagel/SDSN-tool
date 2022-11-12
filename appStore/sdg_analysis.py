@@ -135,7 +135,7 @@ def app():
 
                     st.markdown("#### Anything related to SDGs? ####")
 
-                    c4, c5, c6 = st.columns([2, 3, 2])
+                    c4, c5, c6 = st.columns([2, 2, 2])
 
                     with c5:
                         st.pyplot(fig)
