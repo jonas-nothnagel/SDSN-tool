@@ -143,8 +143,8 @@ def app():
                         st.pyplot(fig)
                     with c6:
                         labeldf = x['SDG_name']
-                        labeldf = labeldf.set_index('SDG_NAME')
-                        st.table(labeldf)
+                        # labeldf = labeldf.set_index('SDG_NAME')
+                        st.write(labeldf.to_string(index=False))
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
