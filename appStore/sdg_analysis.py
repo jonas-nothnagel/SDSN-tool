@@ -141,7 +141,7 @@ def app():
                     with c5:
                         st.pyplot(fig)
                     with c6:
-                        labeldf = x['SDG_name'].values.to_list()
+                        labeldf = x['SDG_name'].values.tolist()
                         labeldf = " \n".join(labeldf)
                         st.write(labeldf)
                     
