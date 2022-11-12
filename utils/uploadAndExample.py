@@ -1,5 +1,6 @@
 import streamlit as st
 import tempfile
+import json
 
 def add_upload(choice):
     """
@@ -22,14 +23,19 @@ def add_upload(choice):
                 
     else:
         # listing the options
+        with open('docStore/sample/files.json','r') as json_file:
+            files = json.load(json_file)
+
         option = st.sidebar.selectbox('Select the example document',
-                              ('South Africa:Low Emission strategy', 
-                              'Ethiopia: 10 Year Development Plan'))
-        if option is 'South Africa:Low Emission strategy':
-            file_name = file_path  = 'docStore/sample/South Africa_s Low Emission Development Strategy.txt'
-            st.session_state['filename'] = file_name
-            st.session_state['filepath'] = file_path
-        else:
-            file_name = file_path =  'docStore/sample/Ethiopia_s_2021_10 Year Development Plan.txt'
-            st.session_state['filename'] = file_name
-            st.session_state['filepath'] = file_path
+                              list(files.keys()))
+        file_name = file_path  = files[option]
+        st.session_state['filename'] = file_name
+        st.session_state['filepath'] = file_path
+        # if option is 'South Africa:Low Emission strategy':
+        #     file_name = file_path  = 'docStore/sample/South Africa_s Low Emission Development Strategy.txt'
+        #     st.session_state['filename'] = file_name
+        #     st.session_state['filepath'] = file_path
+        # else:
+        #     file_name = file_path =  'docStore/sample/Ethiopia_s_2021_10 Year Development Plan.txt'
+        #     st.session_state['filename'] = file_name
+        #     st.session_state['filepath'] = file_path

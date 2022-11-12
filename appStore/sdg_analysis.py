@@ -8,10 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import streamlit as st
-import docx
-from docx.shared import Inches
-from docx.shared import Pt
-from docx.enum.style import WD_STYLE_TYPE
 from st_aggrid import AgGrid
 from st_aggrid.shared import ColumnsAutoSizeMode
 from utils.sdg_classifier import sdg_classification
@@ -75,6 +71,7 @@ def app():
             """)
         st.markdown("")
 
+    ### Label Dictionary ###
     _lab_dict = {0: 'no_cat',
                 1:'SDG 1 - No poverty',
                     2:'SDG 2 - Zero hunger',
@@ -94,6 +91,7 @@ def app():
                 16:'SDG 16 - Peace, justice and strong institutions',
                 17:'SDG 17 - Partnership for the goals',}
     
+    ### Main app code ###
     with st.container():
         if st.button("RUN SDG Analysis"):
        
@@ -114,12 +112,9 @@ def app():
                     textrankkeywordlist = []
                     for label in sdg_labels:
                         sdgdata = " ".join(df[df.SDG == label].text.to_list())
-                        # tfidflist_ = keywordExtraction(label,[sdgdata])
                         textranklist_ = textrank(sdgdata)
                         if len(textranklist_) > 0:
-                        # tfidfkeywordList.append({'SDG':label, 'TFIDF Keywords':tfidflist_})
                             textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':",".join(textranklist_)})
-                    # tfidfkeywordsDf = pd.DataFrame(tfidfkeywordList)
                     tRkeywordsDf = pd.DataFrame(textrankkeywordlist)
 
 
@@ -145,19 +140,15 @@ def app():
                         labeldf = x['SDG_name'].values.tolist()
                         labeldf = "<br>".join(labeldf)
                         st.markdown(labeldf, unsafe_allow_html=True)
-                    
+                    st.write("")
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
-                    # c1, c2, c3 = st.columns([1, 10, 1])
-                    # with c2:
-                    #     st.table(tRkeywordsDf)
                     AgGrid(tRkeywordsDf, reload_data = False, 
                             update_mode="value_changed",
                     columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS)
-
+                    st.write("")
                     st.markdown("###### Top few SDG Classified paragraph/text results ######")
-                    # c7, c8, c9 = st.columns([1, 10, 1])
-                    # with c8:
+
                     AgGrid(df, reload_data = False, update_mode="value_changed",
                     columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS)
             else:
@@ -165,63 +156,3 @@ def app():
                 logging.warning("Terminated as no document provided")
 
 
-
-
-#     1. Keyword heatmap \n
- #               2. SDG Classification for the paragraphs/texts in the document
- #       
-    
-    # with st.container():
-    #     if 'docs' in st.session_state:
-    #         docs = st.session_state['docs']
-    #         docs_processed, df, all_text, par_list = clean.preprocessingForSDG(docs)
-    #         # paraList = st.session_state['paraList']
-    #         logging.info("keybert")
-    #         with st.spinner("Running Key bert"):
-
-    #             kw_model = load_keyBert()
-
-    #             keywords = kw_model.extract_keywords(
-    #             all_text,
-    #             keyphrase_ngram_range=(1, 3),
-    #             use_mmr=True,
-    #             stop_words="english",
-    #             top_n=10,
-    #             diversity=0.7,
-    #             )
-
-    #             st.markdown("## 🎈 What is my document about?")
-            
-    #             df = (
-    #                 DataFrame(keywords, columns=["Keyword/Keyphrase", "Relevancy"])
-    #                 .sort_values(by="Relevancy", ascending=False)
-    #                 .reset_index(drop=True)
-    #             )
-    #             df1 = (
-    #                 DataFrame(keywords, columns=["Keyword/Keyphrase", "Relevancy"])
-    #                 .sort_values(by="Relevancy", ascending=False)
-    #                 .reset_index(drop=True)
-    #             )
-    #             df.index += 1
-
-    #             # Add styling
-    #             cmGreen = sns.light_palette("green", as_cmap=True)
-    #             cmRed = sns.light_palette("red", as_cmap=True)
-    #             df = df.style.background_gradient(
-    #                 cmap=cmGreen,
-    #                 subset=[
-    #                     "Relevancy",
-    #                 ],
-    #             )
-
-    #             c1, c2, c3 = st.columns([1, 3, 1])
-
-    #             format_dictionary = {
-    #                 "Relevancy": "{:.1%}",
-    #             }
-
-    #             df = df.format(format_dictionary)
-
-    #             with c2:
-    #  
-    #               st.table(df)
