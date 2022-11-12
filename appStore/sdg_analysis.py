@@ -142,8 +142,8 @@ def app():
                         st.pyplot(fig)
                     with c6:
                         labeldf = x['SDG_name'].values.tolist()
-                        labeldf = " \n".join(labeldf)
-                        st.write(labeldf)
+                        labeldf = "<br>".join(labeldf)
+                        st.markdown(labeldf)
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
