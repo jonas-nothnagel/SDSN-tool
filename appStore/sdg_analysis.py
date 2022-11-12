@@ -143,7 +143,7 @@ def app():
                     with c6:
                         labeldf = x['SDG_name'].values.tolist()
                         labeldf = "<br>".join(labeldf)
-                        st.markdown(labeldf)
+                        st.markdown(labeldf, unsafe_allow_html=True)
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
 
