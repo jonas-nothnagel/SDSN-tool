@@ -131,6 +131,7 @@ def app():
                         wedgeprops={"linewidth": 1, "edgecolor": "white"}, 
                         frame=False,labels =list(x.SDG),
                         labeldistance=1.2)
+                    fig.tight_layout()
                     # fig.savefig('temp.png', bbox_inches='tight',dpi= 100)
                     
 
@@ -141,8 +142,8 @@ def app():
                     with c5:
                         st.pyplot(fig)
                     with c6:
-                        labeldf = x[['SDG','SDG_name']]
-                        labeldf = labeldf.set_index('SDG')
+                        labeldf = x['SDG_name']
+                        labeldf = labeldf.set_index('SDG_NAME')
                         st.table(labeldf)
                     
                     st.markdown("###### What keywords are present under SDG classified text? ######")
@@ -152,8 +153,7 @@ def app():
                     #     st.table(tRkeywordsDf)
                     AgGrid(tRkeywordsDf, reload_data = False, 
                             update_mode="value_changed",
-                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS,
-                    height = 100 )
+                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS)
 
                     st.markdown("###### Top few SDG Classified paragraph/text results ######")
                     # c7, c8, c9 = st.columns([1, 10, 1])
