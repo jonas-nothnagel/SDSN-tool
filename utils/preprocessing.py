@@ -179,6 +179,8 @@ class UdfPreProcessor(BaseComponent):
         split_by: document splitting strategy either as word or sentence
         split_length: when synthetically creating the paragrpahs from document,
                       it defines the length of paragraph.
+        split_respect_sentence_boundary: Used when using 'word' strategy for 
+        splititng of text.
         
         Return
         ---------

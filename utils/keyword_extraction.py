@@ -5,25 +5,13 @@ import pandas as pd
 # from nltk.corpus import stopwords
 import pickle
 from typing import List, Text
-import configparser
 import logging
 from summa import keywords
-
-try:
-    from termcolor import colored
-except:
-    pass
 
 try:
     import streamlit as st    
 except ImportError:
     logging.info("Streamlit not installed")
-config = configparser.ConfigParser()
-try:
-    config.read_file(open('paramconfig.cfg'))
-except Exception:
-    logging.warning("paramconfig file not found")
-    st.info("Please place the paramconfig file in the same directory as app.py")
 
 
 def sort_coo(coo_matrix):
@@ -68,6 +56,30 @@ def extract_topn_from_vector(feature_names, sorted_items, top_n=10):
         results[feature_vals[idx]]=score_vals[idx]
     
     return results
+
+
+def tfidfKeyword(textdata, vectorizer, tfidfmodel, top_n):
+    """
+    TFIDF based keywords extraction
+    
+    Params
+    ---------
+    vectorizer: trained cont vectorizer model
+    tfidfmodel: TFIDF Tranformer model
+    top_n: Top N keywords to be extracted
+    textdata: text data to which needs keyword extraction
+
+    Return
+    ----------
+    keywords: top extracted keywords
+
+    """
+    features = vectorizer.get_feature_names_out()
+    tf_idf_vector=tfidfmodel.transform(vectorizer.transform(textdata))
+    sorted_items=sort_coo(tf_idf_vector.tocoo())
+    results=extract_topn_from_vector(features,sorted_items,top_n)
+    keywords = [keyword for keyword in results]
+    return keywords
 
 def keywordExtraction(sdg:int,sdgdata:List[Text]):
     """
@@ -115,12 +127,13 @@ def textrank(textdata:Text, ratio:float = 0.1, words = 0):
     results: extracted keywords
     """
     if words == 0:
-        try:
-            words = int(config.get('sdg','TOP_KEY'))
-            results = keywords.keywords(textdata, words = words).split("\n")    
-        except Exception as e:
-            logging.warning(e)
-            results = keywords.keywords(textdata, ratio= ratio).split("\n")
+        # try:
+        #     words = int(config.get('sdg','TOP_KEY'))
+        #     results = keywords.keywords(textdata, words = words).split("\n")    
+        # except Exception as e:
+        #     logging.warning(e)
+        logging.info("Textrank using defulat ratio value = 0.1, as no words limit given")
+        results = keywords.keywords(textdata, ratio= ratio).split("\n")
     else:
         try:
             results = keywords.keywords(textdata, words= words).split("\n")
