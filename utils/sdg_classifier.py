@@ -49,7 +49,7 @@ def load_sdgClassifier(configFile = None, docClassifierModel = None):
 
 @st.cache(allow_output_mutation=True)
 def sdg_classification(haystackdoc:List[Document],
-                        threshold:Float, classifiermodel)->Tuple[DataFrame,Series]:
+                        threshold:float, classifiermodel)->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
     most appropriate label for each text. these labels are in terms of if text 
