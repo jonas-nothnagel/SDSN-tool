@@ -222,19 +222,26 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
         if 'retriever' in st.session_state:
             # if st.session_state['retriever']:
             retriever = st.session_state['retriever']
-    else:
-        if embedding_model:                    
-            retriever = loadRetriever(embedding_model = embedding_model,
-                            embedding_model_format=embedding_model_format,
-                            embedding_layer=embedding_layer,  
-                            retriever_top_k= retriever_top_k, 
-                            document_store = document_store)
-            
-            st.session_state['retriever'] = retriever
         else:
-            logging.warning("no streamlit enviornment found, neither embedding model \
-                provided")
-            return
+            if embedding_model:                    
+                retriever = loadRetriever(embedding_model = embedding_model,
+                                embedding_model_format=embedding_model_format,
+                                embedding_layer=embedding_layer,  
+                                retriever_top_k= retriever_top_k, 
+                                document_store = document_store)
+                
+                st.session_state['retriever'] = retriever
+            else:
+                logging.warning("no streamlit enviornment found, neither embedding model \
+                    provided")
+                return
+    elif embedding_model:
+        retriever = loadRetriever(embedding_model = embedding_model,
+                                embedding_model_format=embedding_model_format,
+                                embedding_layer=embedding_layer,  
+                                retriever_top_k= retriever_top_k, 
+                                document_store = document_store)
+
     
     document_store.update_embeddings(retriever)
     retriever.document_store = document_store
