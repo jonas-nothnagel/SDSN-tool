@@ -91,7 +91,7 @@ def app():
             if 'filepath' in st.session_state:
                 file_name = st.session_state['filename']
                 file_path = st.session_state['filepath']
-                classifier = load_sdgClassifier(model_name)
+                classifier = load_sdgClassifier(docClassifierModel=model_name)
                 allDocuments = runSDGPreprocessingPipeline(fileName= file_name,
                                         filePath= file_path, split_by= split_by,
                                         split_length= split_length,
