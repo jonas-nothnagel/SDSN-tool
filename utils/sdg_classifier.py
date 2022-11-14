@@ -7,14 +7,35 @@ import logging
 import pandas as pd
 from pandas import DataFrame, Series
 from utils.checkconfig import getconfig
+from utils.streamlitcheck import check_streamlit
 from utils.preprocessing import processingpipeline
 try:
     import streamlit as st
 except ImportError:
     logging.info("Streamlit not installed")
 
+## Labels dictionary ###
+_lab_dict = {0: 'no_cat',
+            1:'SDG 1 - No poverty',
+            2:'SDG 2 - Zero hunger',
+            3:'SDG 3 - Good health and well-being',
+            4:'SDG 4 - Quality education',
+            5:'SDG 5 - Gender equality',
+            6:'SDG 6 - Clean water and sanitation',
+            7:'SDG 7 - Affordable and clean energy',
+            8:'SDG 8 - Decent work and economic growth', 
+            9:'SDG 9 - Industry, Innovation and Infrastructure',
+            10:'SDG 10 - Reduced inequality',
+            11:'SDG 11 - Sustainable cities and communities',
+            12:'SDG 12 - Responsible consumption and production',
+            13:'SDG 13 - Climate action',
+            14:'SDG 14 - Life below water',
+            15:'SDG 15 - Life on land',
+            16:'SDG 16 - Peace, justice and strong institutions',
+            17:'SDG 17 - Partnership for the goals',}
+
 @st.cache(allow_output_mutation=True)
-def load_sdgClassifier(configFile = None, docClassifierModel = None):
+def load_sdgClassifier(configFile = None, classifier_name = None):
     """
     loads the document classifier using haystack, where the name/path of model
     in HF-hub as string is used to fetch the model object.Either configfile or 
@@ -31,17 +52,17 @@ def load_sdgClassifier(configFile = None, docClassifierModel = None):
 
     Return: document classifier model
     """
-    if not docClassifierModel:
+    if not classifier_name:
         if not configFile:
             logging.warning("Pass either model name or config file")
             return
         else:
             config = getconfig(configFile)
-            docClassifierModel = config.get('sdg','MODEL')
+            classifier_name = config.get('sdg','MODEL')
     
     logging.info("Loading classifier")    
     doc_classifier = TransformersDocumentClassifier(
-                        model_name_or_path=docClassifierModel,
+                        model_name_or_path=classifier_name,
                         task="text-classification")
 
     return doc_classifier
@@ -49,7 +70,7 @@ def load_sdgClassifier(configFile = None, docClassifierModel = None):
 
 @st.cache(allow_output_mutation=True)
 def sdg_classification(haystackdoc:List[Document],
-                        threshold:float, classifiermodel)->Tuple[DataFrame,Series]:
+                        threshold:float, classifiermodel= None)->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
     most appropriate label for each text. these labels are in terms of if text 
@@ -60,6 +81,10 @@ def sdg_classification(haystackdoc:List[Document],
     haystackdoc: List of haystack Documents. The output of Preprocessing Pipeline 
     contains the list of paragraphs in different format,here the list of 
     Haystack Documents is used.
+    threshold: threshold value for the model to keep the results from classifier
+    classifiermodel: you can pass the classifier model directly, however in case of
+    streamlit avoid it.
+
 
     Returns
     ----------
@@ -69,6 +94,13 @@ def sdg_classification(haystackdoc:List[Document],
 
     """
     logging.info("Working on SDG Classification")
+    if not classifiermodel:
+        if check_streamlit:
+            classifiermodel = st.session_state['sdg_classifier']
+        else:
+            logging.warning("No streamlit envinornment found, Pass the classifier")
+            return
+    
     results = classifiermodel.predict(haystackdoc)
 
 

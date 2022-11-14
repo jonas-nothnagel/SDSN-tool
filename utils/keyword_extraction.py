@@ -107,6 +107,7 @@ def keywordExtraction(sdg:int,sdgdata:List[Text]):
     keywords = [keyword for keyword in results]
     return keywords
 
+@st.cache(allow_output_mutation=True)
 def textrank(textdata:Text, ratio:float = 0.1, words = 0):
     """
     wrappper function to perform textrank, uses either ratio or wordcount to
