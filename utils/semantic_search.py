@@ -219,7 +219,7 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
     """
     document_store = createDocumentStore(documents)
     if check_streamlit:
-        if retriever in st.session_state:
+        if 'retriever' in st.session_state:
             if st.session_state['retriever']:
                 retriever = st.session_state['retriever']
     else:
