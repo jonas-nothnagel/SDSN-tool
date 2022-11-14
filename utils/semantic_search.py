@@ -218,46 +218,46 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
 
     """
     document_store = createDocumentStore(documents)
-    if check_streamlit:
-        if 'retriever' in st.session_state:
-            # if st.session_state['retriever']:
-            retriever = st.session_state['retriever']
-        else:
-            if embedding_model:                    
-                retriever = loadRetriever(embedding_model = embedding_model,
-                                embedding_model_format=embedding_model_format,
-                                embedding_layer=embedding_layer,  
-                                retriever_top_k= retriever_top_k, 
-                                document_store = document_store)
+    # if check_streamlit:
+    #     if 'retriever' in st.session_state:
+    #         # if st.session_state['retriever']:
+    #         retriever = st.session_state['retriever']
+    #     else:
+    #         if embedding_model:                    
+    retriever = loadRetriever(embedding_model = embedding_model,
+                    embedding_model_format=embedding_model_format,
+                    embedding_layer=embedding_layer,  
+                    retriever_top_k= retriever_top_k, 
+                    document_store = document_store)
                 
-                st.session_state['retriever'] = retriever
-            else:
-                logging.warning("no streamlit enviornment found, neither embedding model \
-                    provided")
-                return
-    elif embedding_model:
-        retriever = loadRetriever(embedding_model = embedding_model,
-                                embedding_model_format=embedding_model_format,
-                                embedding_layer=embedding_layer,  
-                                retriever_top_k= retriever_top_k, 
-                                document_store = document_store)
+                # st.session_state['retriever'] = retriever
+    #         else:
+    #             logging.warning("no streamlit enviornment found, neither embedding model \
+    #                 provided")
+    #             return
+    # elif embedding_model:
+    #     retriever = loadRetriever(embedding_model = embedding_model,
+    #                             embedding_model_format=embedding_model_format,
+    #                             embedding_layer=embedding_layer,  
+    #                             retriever_top_k= retriever_top_k, 
+    #                             document_store = document_store)
 
     
     document_store.update_embeddings(retriever)
-    retriever.document_store = document_store
+    # retriever.document_store = document_store
     querycheck = QueryCheck()
-    if check_streamlit:
-        if 'reader' in st.session_state:
-            reader = st.session_state['reader']
+    # if check_streamlit:
+    #     if 'reader' in st.session_state:
+    #         reader = st.session_state['reader']
         
-        else:
-            if reader_model:
-                reader = FARMReader(model_name_or_path=reader_model,
-                                top_k = reader_top_k, use_gpu=True)
-                st.session_state['reader'] = reader
-    elif reader_model:
-                reader = FARMReader(model_name_or_path=reader_model,
-                                top_k = reader_top_k, use_gpu=True)
+    #     else:
+    #         if reader_model:
+    reader = FARMReader(model_name_or_path=reader_model,
+                    top_k = reader_top_k, use_gpu=True)
+    #             st.session_state['reader'] = reader
+    # elif reader_model:
+    #             reader = FARMReader(model_name_or_path=reader_model,
+    #                             top_k = reader_top_k, use_gpu=True)
 
     semanticsearch_pipeline = Pipeline()
     semanticsearch_pipeline.add_node(component = querycheck, name = "QueryCheck",
