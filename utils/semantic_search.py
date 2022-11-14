@@ -250,11 +250,14 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
         if 'reader' in st.session_state:
             reader = st.session_state['reader']
         
-    else:
-        if reader_model:
-            reader = FARMReader(model_name_or_path=reader_model,
-                            top_k = reader_top_k, use_gpu=True)
-        st.session_state['reader'] = reader
+        else:
+            if reader_model:
+                reader = FARMReader(model_name_or_path=reader_model,
+                                top_k = reader_top_k, use_gpu=True)
+                st.session_state['reader'] = reader
+    elif reader_model:
+                reader = FARMReader(model_name_or_path=reader_model,
+                                top_k = reader_top_k, use_gpu=True)
 
     semanticsearch_pipeline = Pipeline()
     semanticsearch_pipeline.add_node(component = querycheck, name = "QueryCheck",
