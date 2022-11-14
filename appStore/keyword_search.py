@@ -114,7 +114,12 @@ def app():
 
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
-                            semantic_search(queryList,allDocuments['documents'])
+                            semantic_search(query = queryList, 
+                            documents = allDocuments['documents'],
+                            embedding_model=embedding_model, 
+                            embedding_layer=embedding_layer,
+                            reader_model=reader_model,reader_top_k=reader_top_k,
+                            retriever_top_k=retriever_top_k)
 
                 else:
                     st.info("🤔 No document found, please try to upload it at the sidebar!")
