@@ -118,7 +118,9 @@ def app():
                             documents = allDocuments['documents'],
                             embedding_model=embedding_model, 
                             embedding_layer=embedding_layer,
+                            embedding_model_format=embedding_model_format,
                             reader_model=reader_model,reader_top_k=reader_top_k,
+
                             retriever_top_k=retriever_top_k)
 
                 else:
