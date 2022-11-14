@@ -2,11 +2,11 @@ from haystack.nodes import TransformersQueryClassifier
 from haystack.nodes import EmbeddingRetriever, FARMReader
 from haystack.nodes.base import BaseComponent
 from haystack.document_stores import InMemoryDocumentStore
-import configparser
 from markdown import markdown
 from annotated_text import annotation
 from haystack.schema import Document
 from typing import List, Text
+from typing_extensions import Literal
 from utils.preprocessing import processingpipeline
 from utils.streamlitcheck import check_streamlit
 from haystack.pipelines import Pipeline
@@ -19,16 +19,15 @@ try:
     import streamlit as st    
 except ImportError:
     logging.info("Streamlit not installed")
-config = configparser.ConfigParser()
-try:
-    config.read_file(open('paramconfig.cfg'))
-except Exception:
-    logging.info("paramconfig file not found")
-    st.info("Please place the paramconfig file in the same directory as app.py")
 
 
 @st.cache(allow_output_mutation=True)
 def loadQueryClassifier():
+    """
+    retuns the haystack query classifier model
+    model = shahrukhx01/bert-mini-finetune-question-detection
+    
+    """
     query_classifier = TransformersQueryClassifier(model_name_or_path=
                             "shahrukhx01/bert-mini-finetune-question-detection")
     return query_classifier
@@ -63,8 +62,12 @@ class QueryCheck(BaseComponent):
     def run_batch(self, query):
         pass
 
-
-def runSemanticPreprocessingPipeline(file_path, file_name)->List[Document]:
+@st.cache(allow_output_mutation=True)
+def runSemanticPreprocessingPipeline(file_path, file_name, 
+                split_by: Literal["sentence", "word"] = 'sentence',
+                split_respect_sentence_boundary = False,
+                split_length:int = 2, split_overlap = 0,
+                removePunc = False)->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
@@ -76,6 +79,12 @@ def runSemanticPreprocessingPipeline(file_path, file_name)->List[Document]:
     st.session_state['filename']
     file_path: filepath, in case of streamlit application use 
     st.session_state['filepath']
+    removePunc: to remove all Punctuation including ',' and '.' or not
+    split_by: document splitting strategy either as word or sentence
+    split_length: when synthetically creating the paragrpahs from document,
+                    it defines the length of paragraph.
+    split_respect_sentence_boundary: Used when using 'word' strategy for 
+    splititng of text.
 
     Return
     --------------
@@ -87,61 +96,90 @@ def runSemanticPreprocessingPipeline(file_path, file_name)->List[Document]:
     """
 
     semantic_processing_pipeline = processingpipeline()
-    split_by = config.get('semantic_search','SPLIT_BY')
-    split_length = int(config.get('semantic_search','SPLIT_LENGTH'))
-    split_overlap = int(config.get('semantic_search','SPLIT_OVERLAP'))
 
     output_semantic_pre = semantic_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
-                                        "UdfPreProcessor": {"removePunc": False, \
+                                        "UdfPreProcessor": {"removePunc": removePunc, \
                                             "split_by": split_by, \
                                             "split_length":split_length,\
-                                            "split_overlap": split_overlap}})
+                                            "split_overlap": split_overlap,
+        "split_respect_sentence_boundary":split_respect_sentence_boundary}})
 
     return output_semantic_pre
 
 
 @st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
-def loadRetriever(embedding_model =  None, embedding_model_format = None, 
-                 embedding_layer = None,  retriever_top_k = 10, document_store = None):
+def loadRetriever(embedding_model:Text =  None, embedding_model_format:Text = None, 
+                 embedding_layer:int = None,  retriever_top_k:int = 10, 
+                 document_store:InMemoryDocumentStore = None):
+    """
+    Returns the Retriever model based on params provided.
+    1. https://docs.haystack.deepset.ai/docs/retriever#embedding-retrieval-recommended
+    2. https://www.sbert.net/examples/applications/semantic-search/README.html
+    3. https://github.com/deepset-ai/haystack/blob/main/haystack/nodes/retriever/dense.py
+
+    
+    Params
+    ---------
+    embedding_model: Name of the model to be used for embedding. Check the links
+    provided in documentation
+    embedding_model_format: check the github link of Haystack provided in documentation
+    embedding_layer: check the github link of Haystack provided in documentation
+    retriever_top_k: Number of Top results to be returned by retriever
+    document_store: InMemoryDocumentStore, write haystack Document list to DocumentStore
+    and pass the same to function call. Can be done using createDocumentStore from utils.
+    
+    Return
+    -------
+    retriever: emebedding model
+    """
     logging.info("loading retriever")
     if document_store is None:
         logging.warning("Retriever initialization requires the DocumentStore")
         return
-
-
-    if embedding_model is None:
-        try:   
-            embedding_model = config.get('semantic_search','RETRIEVER')
-            embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
-            embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
-            retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
-        except Exception as e:
-            logging.info(e)
-            st.info(e)
     
     retriever = EmbeddingRetriever(
                 embedding_model=embedding_model,top_k = retriever_top_k,
                 document_store = document_store,
                 emb_extraction_layer=embedding_layer, scale_score =True,
                 model_format=embedding_model_format, use_gpu = True)
-    st.session_state['retriever'] = retriever
+    if check_streamlit:
+        st.session_state['retriever'] = retriever
     return retriever
 
 @st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
 def createDocumentStore(documents:List[Document], similarity:str = 'cosine'):
+    """
+    Creates the InMemory Document Store frm haystack list of Documents.
+    It is  mandatory component for Retriever to work in Haystack frame work.
+    
+    Params
+    -------
+    documents: List of haystack document. If using the preprocessing pipeline, 
+    can be fetched key = 'documents; on output of preprocessing pipeline.
+    similarity: scoring function, can be either 'cosine' or 'dot_product'
+    
+    Return
+    -------
+    document_store: InMemory Document Store object type.
+    
+    """
     document_store = InMemoryDocumentStore(similarity = similarity)
     document_store.write_documents(documents)
-    if 'retriever' in st.session_state:
-        retriever = st.session_state['retriever']
-        document_store.update_embeddings(retriever)
+    # if check_streamlit:
+    #     if 'retriever' in st.session_state:
+    #         retriever = st.session_state['retriever']
+    #         document_store.update_embeddings(retriever)
     
     return document_store
 
 
 @st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
-def semanticSearchPipeline(documents:List[Document]):
+def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  None, 
+                embedding_model_format:Text = None, 
+                 embedding_layer:int = None,  retriever_top_k:int = 10,
+                 reader_model:str =  None, reader_top_k:int = 10):
     """
     creates the semantic search pipeline and document Store object from the
     list of haystack documents. Retriever and Reader model are read from 
@@ -149,32 +187,66 @@ def semanticSearchPipeline(documents:List[Document]):
     all the results returned by Retriever are used, however the context is 
     extracted by Reader for each retrieved result. The querycheck is added as
     node to process the query.
+    1. https://docs.haystack.deepset.ai/docs/retriever#embedding-retrieval-recommended
+    2. https://www.sbert.net/examples/applications/semantic-search/README.html
+    3. https://github.com/deepset-ai/haystack/blob/main/haystack/nodes/retriever/dense.py
+    4. https://docs.haystack.deepset.ai/docs/reader
+
 
     
     Params
     ----------
     documents: list of Haystack Documents, returned by preprocessig pipeline.
+    embedding_model: Name of the model to be used for embedding. Check the links
+    provided in documentation
+    embedding_model_format: check the github link of Haystack provided in documentation
+    embedding_layer: check the github link of Haystack provided in documentation
+    retriever_top_k: Number of Top results to be returned by retriever
+    reader_model: Name of the model to be used for Reader node in hasyatck 
+    Pipeline. Check the links provided in documentation
+    reader_top_k: Reader will use retrieved results to further find better matches.
+                As purpose here is to use reader to extract context, the value is
+                same as retriever_top_k.
 
     Return
     ---------
     semanticsearch_pipeline: Haystack Pipeline object, with all the necessary 
     nodes [QueryCheck, Retriever, Reader]
 
-    document_store: As retriever cna work only with Haystack Document Store, the
+    document_store: As retriever can work only with Haystack Document Store, the
     list of document returned by preprocessing pipeline.
 
     """
     document_store = createDocumentStore(documents)
-    retriever = loadRetriever(document_store=document_store)
-    document_store.update_embeddings(retriever)
-    querycheck = QueryCheck()
-    if 'reader' in st.session_state:
-        reader = st.session_state['reader']
+    if check_streamlit:
+        if retriever in st.session_state:
+            if st.session_state['retriever']:
+                retriever = st.session_state['retriever']
     else:
-        reader_model = config.get('semantic_search','READER')
-        reader_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
-        reader = FARMReader(model_name_or_path=reader_model,
-                        top_k = reader_top_k, use_gpu=True)
+        if embedding_model:                    
+            retriever = loadRetriever(embedding_model = embedding_model,
+                            embedding_model_format=embedding_model_format,
+                            embedding_layer=embedding_layer,  
+                            retriever_top_k= retriever_top_k, 
+                            document_store = document_store)
+            
+            st.session_state['retriever'] = retriever
+        else:
+            logging.warning("no streamlit enviornment found, neither embedding model \
+                provided")
+            return
+    
+    document_store.update_embeddings(retriever)
+    retriever.document_store = document_store
+    querycheck = QueryCheck()
+    if check_streamlit:
+        if 'reader' in st.session_state:
+            reader = st.session_state['reader']
+        
+    else:
+        if reader_model:
+            reader = FARMReader(model_name_or_path=reader_model,
+                            top_k = reader_top_k, use_gpu=True)
         st.session_state['reader'] = reader
 
     semanticsearch_pipeline = Pipeline()
@@ -224,7 +296,10 @@ def semanticsearchAnnotator(matches: List[List[int]], document):
         print(annotated_text)
     
 
-def semantic_search(query:Text,documents:List[Document]):
+def semantic_search(query:Text,documents:List[Document],embedding_model:Text, 
+                embedding_model_format:Text, 
+                 embedding_layer:int,  reader_model:str,
+                 retriever_top_k:int = 10, reader_top_k:int = 10):
     """
     Performs the Semantic search on the List of haystack documents which is 
     returned by preprocessing Pipeline.
@@ -235,9 +310,19 @@ def semantic_search(query:Text,documents:List[Document]):
     documents: List fo Haystack documents returned by preprocessing pipeline.
     
     """
-    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents)
+    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents,
+                        embedding_model= embedding_model, 
+                        embedding_layer= embedding_layer,
+                        embedding_model_format= embedding_model_format,
+                        reader_model= reader_model, retriever_top_k= retriever_top_k,
+                        reader_top_k= reader_top_k)
+
     results = semanticsearch_pipeline.run(query = query)
-    st.markdown("##### Top few semantic search results #####")
+
+    if check_streamlit:
+        st.markdown("##### Top few semantic search results #####")
+    else:
+        print("Top few semantic search results")
     for i,answer in enumerate(results['answers']):
         temp = answer.to_dict()
         start_idx = temp['offsets_in_document'][0]['start']

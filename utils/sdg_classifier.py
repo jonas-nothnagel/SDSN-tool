@@ -2,7 +2,6 @@ from haystack.nodes import TransformersDocumentClassifier
 from haystack.schema import Document
 from typing import List, Tuple
 from typing_extensions import Literal
-import configparser
 import logging
 import pandas as pd
 from pandas import DataFrame, Series

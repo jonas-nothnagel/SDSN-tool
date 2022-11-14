@@ -7,6 +7,21 @@ import json
 import logging
 from utils.lexical_search import runLexicalPreprocessingPipeline, lexical_search
 from utils.semantic_search import runSemanticPreprocessingPipeline, semantic_search
+from utils.checkconfig import getconfig
+
+# Declare all the necessary variables
+config = getconfig('paramconfig.cfg')
+split_by = config.get('semantic_search','SPLIT_BY')
+split_length = int(config.get('semantic_search','SPLIT_LENGTH'))
+split_overlap = int(config.get('semantic_search','SPLIT_OVERLAP'))
+split_respect_sentence_boundary = bool(int(config.get('semantic_search','RESPECT_SENTENCE_BOUNDARY')))
+remove_punc = bool(int(config.get('semantic_search','REMOVE_PUNC')))
+embedding_model = config.get('semantic_search','RETRIEVER')
+embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
+embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+reader_model = config.get('semantic_search','READER')
+reader_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
 
 def app():
 
@@ -77,19 +92,26 @@ def app():
                     
                     
                     if searchtype == 'Exact Matches':
-                        allDocuments = runLexicalPreprocessingPipeline(
-                                            st.session_state['filepath'],
-                                            st.session_state['filename'])
-                        logging.info("performing lexical search")
-                        with st.spinner("Performing Exact matching search \
-                                        (Lexical search) for you"):
-                            st.markdown("##### Top few lexical search (TFIDF) hits #####")
-                            lexical_search(queryList,allDocuments['documents'])
+                        # allDocuments = runLexicalPreprocessingPipeline(
+                        #                     st.session_state['filepath'],
+                        #                     st.session_state['filename'])
+                        # logging.info("performing lexical search")
+                        # with st.spinner("Performing Exact matching search \
+                        #                 (Lexical search) for you"):
+                        #     st.markdown("##### Top few lexical search (TFIDF) hits #####")
+                        #     lexical_search(queryList,allDocuments['documents'])
+                        pass
                     else:
                         allDocuments = runSemanticPreprocessingPipeline(
-                                            st.session_state['filepath'],
-                                            st.session_state['filename'])
+                                            file_path= st.session_state['filepath'],
+                                            file_name  = st.session_state['filename'],
+                                            split_by=split_by,
+                                            split_length= split_length,
+                                            split_overlap=split_overlap,
+                                            removePunc= remove_punc,
+                            split_respect_sentence_boundary=split_respect_sentence_boundary)
                         
+
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search"):
                             semantic_search(queryList,allDocuments['documents'])
