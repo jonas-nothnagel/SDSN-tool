@@ -91,7 +91,8 @@ def app():
                                     for and we will we will look for similar\
                                     context in the document. You can select the \
                                     presets of keywords from sidebar.",
-                                placeholder="Enter keyword here")
+                                    value = "{}".format(keywordList))
+                                # placeholder="Enter keyword here")
         searchtype = st.checkbox("Show only Exact Matches")
         if st.button("Find them"):
 
