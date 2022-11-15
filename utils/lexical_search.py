@@ -8,9 +8,9 @@ from markdown import markdown
 from annotated_text import annotation
 from haystack.schema import Document
 from typing import List, Text
+from typing_extensions import Literal
 from utils.preprocessing import processingpipeline
 from utils.streamlitcheck import check_streamlit
-import configparser
 import logging
 try:
     from termcolor import colored
@@ -21,18 +21,17 @@ try:
     import streamlit as st    
 except ImportError:
     logging.info("Streamlit not installed")
-config = configparser.ConfigParser()
-try:
-    config.read_file(open('paramconfig.cfg'))
-except Exception:
-    logging.warning("paramconfig file not found")
-    st.info("Please place the paramconfig file in the same directory as app.py")
 
 
-def runLexicalPreprocessingPipeline(file_path, file_name)->List[Document]:
+def runLexicalPreprocessingPipeline(file_path,file_name,
+                        split_by: Literal["sentence", "word"] = 'word', 
+                        split_length:int = 80, removePunc:bool = False, 
+                        split_overlap:int = 0 )->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
-    the params for pipeline are fetched from paramconfig
+    the params for pipeline are fetched from paramconfig. As lexical doesnt gets
+    affected by overlap, threfore split_overlap = 0 in default paramconfig and 
+    split_by = word.
 
     Params
     ------------
@@ -41,6 +40,11 @@ def runLexicalPreprocessingPipeline(file_path, file_name)->List[Document]:
     st.session_state['filename']
     file_path: filepath, in case of streamlit application use 
     st.session_state['filepath']
+    removePunc: to remove all Punctuation including ',' and '.' or not
+    split_by: document splitting strategy either as word or sentence
+    split_length: when synthetically creating the paragrpahs from document,
+                    it defines the length of paragraph.
+    splititng of text.
 
     Return
     --------------
@@ -52,14 +56,12 @@ def runLexicalPreprocessingPipeline(file_path, file_name)->List[Document]:
     """
     
     lexical_processing_pipeline = processingpipeline()
-    split_by = config.get('lexical_search','SPLIT_BY')
-    split_length = int(config.get('lexical_search','SPLIT_LENGTH'))
-    split_overlap = int(config.get('lexical_search','SPLIT_OVERLAP'))
+
 
     output_lexical_pre = lexical_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
-                                        "UdfPreProcessor": {"removePunc": False, \
+                                        "UdfPreProcessor": {"removePunc": removePunc, \
                                             "split_by": split_by, \
                                             "split_length":split_length,\
                                             "split_overlap": split_overlap}})
@@ -201,7 +203,7 @@ def spacyAnnotator(matches: List[List[int]], document:spacy.tokens.doc.Doc):
     else:
         print(annotated_text)
 
-def lexical_search(query:Text,documents:List[Document]):
+def lexical_search(query:Text,top_k:int, documents:List[Document]):
     """
     Performs the Lexical search on the List of haystack documents which is 
     returned by preprocessing Pipeline.
@@ -210,6 +212,7 @@ def lexical_search(query:Text,documents:List[Document]):
     -------
     query: Keywords that need to be searche in documents.
     documents: List of Haystack documents returned by preprocessing pipeline.
+    top_k: Number of Top results to be fetched.
     
     """
 
@@ -218,8 +221,7 @@ def lexical_search(query:Text,documents:List[Document]):
     
     # Haystack Retriever works with document stores only.
     retriever = TfidfRetriever(document_store)
-    results = retriever.retrieve(query=query, 
-                            top_k= int(config.get('lexical_search','TOP_K')))
+    results = retriever.retrieve(query=query, top_k = top_k)          
     query_tokens = tokenize_lexical_query(query)
     for count, result in enumerate(results):
         matches, doc = runSpacyMatcher(query_tokens,result.content)

@@ -167,7 +167,7 @@ class UdfPreProcessor(BaseComponent):
     def run(self, documents:List[Document], removePunc:bool, 
             split_by: Literal["sentence", "word"] = 'sentence',
             split_respect_sentence_boundary = False,
-            split_length:int = 2, split_overlap = 0):
+            split_length:int = 2, split_overlap:int = 0):
 
         """ this is required method to invoke the component in 
         the pipeline implementation. 
@@ -181,6 +181,9 @@ class UdfPreProcessor(BaseComponent):
                       it defines the length of paragraph.
         split_respect_sentence_boundary: Used when using 'word' strategy for 
         splititng of text.
+        split_overlap: Number of words or sentences that overlap when creating
+        the paragraphs. This is done as one sentence or 'some words' make sense
+        when  read in together with others. Therefore the overlap is used.
         
         Return
         ---------

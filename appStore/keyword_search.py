@@ -14,7 +14,8 @@ config = getconfig('paramconfig.cfg')
 split_by = config.get('semantic_search','SPLIT_BY')
 split_length = int(config.get('semantic_search','SPLIT_LENGTH'))
 split_overlap = int(config.get('semantic_search','SPLIT_OVERLAP'))
-split_respect_sentence_boundary = bool(int(config.get('semantic_search','RESPECT_SENTENCE_BOUNDARY')))
+split_respect_sentence_boundary = bool(int(config.get('semantic_search',
+                                    'RESPECT_SENTENCE_BOUNDARY')))
 remove_punc = bool(int(config.get('semantic_search','REMOVE_PUNC')))
 embedding_model = config.get('semantic_search','RETRIEVER')
 embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
@@ -22,6 +23,11 @@ embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
 retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
 reader_model = config.get('semantic_search','READER')
 reader_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+lexical_split_by= config.get('lexical_search','SPLIT_BY')
+lexical_split_length=int(config.get('lexical_search','SPLIT_LENGTH'))
+lexical_split_overlap = int(config.get('lexical_search','SPLIT_OVERLAP'))
+lexical_remove_punc = bool(int(config.get('lexical_search','REMOVE_PUNC')))
+lexical_top_k=int(config.get('lexical_search','TOP_K'))
 
 def app():
 
@@ -49,22 +55,23 @@ def app():
             keywordexample = json.load(json_file)
         
         genre = st.radio("Select Keyword Category", list(keywordexample.keys()))
-        if genre == 'Food':
-            keywordList = keywordexample['Food']
-        elif genre == 'Climate':
-            keywordList = keywordexample['Climate']
-        elif genre == 'Social':
-            keywordList = keywordexample['Social']
-        elif genre == 'Nature':
-            keywordList = keywordexample['Nature']
-        elif genre == 'Implementation':
-            keywordList = keywordexample['Implementation']
+        if genre:
+            keywordList = keywordexample[genre]
+        # elif genre == 'Climate':
+        #     keywordList = keywordexample['Climate']
+        # elif genre == 'Social':
+        #     keywordList = keywordexample['Social']
+        # elif genre == 'Nature':
+        #     keywordList = keywordexample['Nature']
+        # elif genre == 'Implementation':
+        #     keywordList = keywordexample['Implementation']
         else:
             keywordList = None
         
-        searchtype = st.selectbox("Do you want to find exact macthes or similar \
-                                    meaning/context",
-                                 ['Exact Matches', 'Similar context/meaning'])
+        # searchtype = st.selectbox("Do you want to find exact macthes or similar \
+        #                             meaning/context",
+        #                          ['Exact Matches', 'Similar context/meaning'])
+        
 
         st.markdown("---")
     
@@ -80,7 +87,7 @@ def app():
                                         for and we will we will look for similar\
                                         context in the document.",
                                     placeholder="Enter keyword here")
-        
+        searchtype = st.checkbox("Show only Exact Matches")
         if st.button("Find them"):
 
             if queryList == "":
@@ -91,16 +98,22 @@ def app():
                 if 'filepath' in st.session_state:
                     
                     
-                    if searchtype == 'Exact Matches':
-                        # allDocuments = runLexicalPreprocessingPipeline(
-                        #                     st.session_state['filepath'],
-                        #                     st.session_state['filename'])
-                        # logging.info("performing lexical search")
-                        # with st.spinner("Performing Exact matching search \
-                        #                 (Lexical search) for you"):
-                        #     st.markdown("##### Top few lexical search (TFIDF) hits #####")
-                        #     lexical_search(queryList,allDocuments['documents'])
-                        pass
+                    if searchtype:
+                        allDocuments = runLexicalPreprocessingPipeline(
+                                    file_name=st.session_state['filename'],
+                                    file_path=st.session_state['filepath'],
+                                    split_by=lexical_split_by,
+                                    split_length=lexical_split_length,
+                                    split_overlap=lexical_split_overlap,
+                                    removePunc=lexical_remove_punc), 
+                        logging.info("performing lexical search")
+                        with st.spinner("Performing Exact matching search \
+                                        (Lexical search) for you"):
+                            st.markdown("##### Top few lexical search (TFIDF) hits #####")
+                            lexical_search(
+                                query=queryList,
+                                documents = allDocuments['documents'],
+                                top_k = lexical_top_k )
                     else:
                         allDocuments = runSemanticPreprocessingPipeline(
                                             file_path= st.session_state['filepath'],
@@ -109,7 +122,7 @@ def app():
                                             split_length= split_length,
                                             split_overlap=split_overlap,
                                             removePunc= remove_punc,
-                            split_respect_sentence_boundary=split_respect_sentence_boundary)
+                        split_respect_sentence_boundary=split_respect_sentence_boundary)
                         
 
                         logging.info("starting semantic search")
@@ -120,7 +133,6 @@ def app():
                             embedding_layer=embedding_layer,
                             embedding_model_format=embedding_model_format,
                             reader_model=reader_model,reader_top_k=reader_top_k,
-
                             retriever_top_k=retriever_top_k)
 
                 else:
