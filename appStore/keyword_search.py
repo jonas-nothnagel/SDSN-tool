@@ -47,20 +47,21 @@ def app():
             policy document - developed by GIZ Data and the \
             Sustainable Development Solution Network.
             """)
+        st.write("")
         st.write(""" The application allows its user to perform a keyword search\
-             based on two options: a lexical (TFIDF) search and semantic  \
-             bi-encoder search. The difference between both approaches is quite \
-            straightforward; while the lexical search only displays paragraphs \
-            in the document with exact matching results, the semantic search \
-            shows paragraphs with meaningful connections (e.g., synonyms) based\
-            on the context as well. The semantic search allows for a personalized\
-            experience in using the application. Both methods employ a \
-            probabilistic retrieval framework in its identification of relevant \
-            paragraphs. By defualt the search is performed using 'Semantic Search'
-            to find 'Exact/Lexical Matches' please tick the checkbox provided, which will \
-            by pass semantic search.. Furthermore, the application allows the \
-            user to search for pre-defined keywords from different thematic buckets\
-            present in sidebar.""")
+             based on two options: a lexical ([TFIDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf))\
+             search and semantic bi-encoder search. The difference between both \
+            approaches is quite straightforward; while the lexical search only \
+            displays paragraphs in the document with exact matching results, \
+            the semantic search shows paragraphs with meaningful connections \
+            (e.g., synonyms) based on the context as well. The semantic search \
+            allows for a personalized experience in using the application. Both \
+            methods employ a probabilistic retrieval framework in its identification\
+            of relevant paragraphs. By defualt the search is performed using \
+            'Semantic Search' to find 'Exact/Lexical Matches' please tick the \
+            checkbox provided, which will by pass semantic search.. Furthermore,\
+            the application allows the user to search for pre-defined keywords \
+            from different thematic buckets present in sidebar.""")
 
     
     with st.sidebar:
