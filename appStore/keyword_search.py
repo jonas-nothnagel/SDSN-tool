@@ -56,10 +56,11 @@ def app():
             on the context as well. The semantic search allows for a personalized\
             experience in using the application. Both methods employ a \
             probabilistic retrieval framework in its identification of relevant \
-            paragraphs. By defualt the search is perfomred using 'Semantic Search'
-            , to find 'Exact/Lexical Matches' checkbox is provided, which will \
+            paragraphs. By defualt the search is performed using 'Semantic Search'
+            to find 'Exact/Lexical Matches' please tick the checkbox provided, which will \
             by pass semantic search.. Furthermore, the application allows the \
-            user to search for pre-defined keywords from different thematic buckets""")
+            user to search for pre-defined keywords from different thematic buckets\
+            present in sidebar.""")
 
     
     with st.sidebar:
@@ -72,11 +73,6 @@ def app():
         else:
             keywordList = None
         
-        # searchtype = st.selectbox("Do you want to find exact macthes or similar \
-        #                             meaning/context",
-        #                          ['Exact Matches', 'Similar context/meaning'])
-        
-
         st.markdown("---")
     
     with st.container():
@@ -84,7 +80,6 @@ def app():
         #     queryList = st.text_input("You selected the {} category we \
         #                 will look for these keywords in document".format(genre),
         #                             value="{}".format(keywordList))
-        # else:
         queryList = st.text_input("Please enter here your question and we \
                                     will look for an answer in the document\
                                     OR enter the keyword you are looking \
@@ -92,7 +87,6 @@ def app():
                                     context in the document. You can select the \
                                     presets of keywords from sidebar.",
                                     value = "{}".format(keywordList))
-                                # placeholder="Enter keyword here")
         searchtype = st.checkbox("Show only Exact Matches")
         if st.button("Find them"):
 
@@ -129,10 +123,13 @@ def app():
                                             split_overlap=split_overlap,
                                             removePunc= remove_punc,
                         split_respect_sentence_boundary=split_respect_sentence_boundary)
-                        
+                        if len(allDocuments['documents']) > 100:
+                            warning_msg = ": This might take sometime, please sit back and relax."
+                        else:
+                            warning_msg = ""
 
                         logging.info("starting semantic search")
-                        with st.spinner("Performing Similar/Contextual search"):
+                        with st.spinner("Performing Similar/Contextual search{}".format(warning_msg)):
                             semantic_search(query = queryList, 
                             documents = allDocuments['documents'],
                             embedding_model=embedding_model, 
