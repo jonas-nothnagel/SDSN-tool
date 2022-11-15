@@ -34,7 +34,7 @@ _lab_dict = {0: 'no_cat',
             17:'SDG 17 - Partnership for the goals',}
 
 @st.cache(allow_output_mutation=True)
-def load_sdgClassifier(configFile = None, classifier_name = None):
+def load_sdgClassifier(config_file = None, classifier_name = None):
     """
     loads the document classifier using haystack, where the name/path of model
     in HF-hub as string is used to fetch the model object.Either configfile or 
@@ -52,11 +52,11 @@ def load_sdgClassifier(configFile = None, classifier_name = None):
     Return: document classifier model
     """
     if not classifier_name:
-        if not configFile:
+        if not config_file:
             logging.warning("Pass either model name or config file")
             return
         else:
-            config = getconfig(configFile)
+            config = getconfig(config_file)
             classifier_name = config.get('sdg','MODEL')
     
     logging.info("Loading classifier")    
@@ -68,8 +68,8 @@ def load_sdgClassifier(configFile = None, classifier_name = None):
         
 
 @st.cache(allow_output_mutation=True)
-def sdg_classification(haystackdoc:List[Document],
-                        threshold:float, classifiermodel= None)->Tuple[DataFrame,Series]:
+def sdg_classification(haystack_doc:List[Document],
+                        threshold:float, classifier_model= None)->Tuple[DataFrame,Series]:
     """
     Text-Classification on the list of texts provided. Classifier provides the 
     most appropriate label for each text. these labels are in terms of if text 
@@ -93,14 +93,14 @@ def sdg_classification(haystackdoc:List[Document],
 
     """
     logging.info("Working on SDG Classification")
-    if not classifiermodel:
+    if not classifier_model:
         if check_streamlit:
-            classifiermodel = st.session_state['sdg_classifier']
+            classifier_model = st.session_state['sdg_classifier']
         else:
             logging.warning("No streamlit envinornment found, Pass the classifier")
             return
     
-    results = classifiermodel.predict(haystackdoc)
+    results = classifier_model.predict(haystack_doc)
 
 
     labels_= [(l.meta['classification']['label'],
@@ -130,7 +130,7 @@ def runSDGPreprocessingPipeline(filePath, fileName,
             split_by: Literal["sentence", "word"] = 'sentence',
             split_respect_sentence_boundary = False,
             split_length:int = 2, split_overlap = 0,
-            removePunc = False)->List[Document]:
+            remove_punc = False)->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig
@@ -163,7 +163,7 @@ def runSDGPreprocessingPipeline(filePath, fileName,
     output_sdg_pre = sdg_processing_pipeline.run(file_paths = filePath, 
                             params= {"FileConverter": {"file_path": filePath, \
                                         "file_name": fileName}, 
-                                     "UdfPreProcessor": {"removePunc": removePunc, \
+                                     "UdfPreProcessor": {"remove_punc": remove_punc, \
                                             "split_by": split_by, \
                                             "split_length":split_length,\
                                             "split_overlap": split_overlap, \

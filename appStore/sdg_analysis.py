@@ -93,31 +93,31 @@ def app():
                 file_path = st.session_state['filepath']
                 classifier = load_sdgClassifier(classifier_name=model_name)
                 st.session_state['sdg_classifier'] = classifier
-                allDocuments = runSDGPreprocessingPipeline(fileName= file_name,
+                all_documents = runSDGPreprocessingPipeline(fileName= file_name,
                                         filePath= file_path, split_by= split_by,
                                         split_length= split_length,
                                         split_overlap= split_overlap,
                 split_respect_sentence_boundary= split_respect_sentence_boundary,
-                removePunc= remove_punc)
+                remove_punc= remove_punc)
 
-                if len(allDocuments['documents']) > 100:
+                if len(all_documents['documents']) > 100:
                     warning_msg = ": This might take sometime, please sit back and relax."
                 else:
                     warning_msg = ""
 
                 with st.spinner("Running SDG Classification{}".format(warning_msg)):
 
-                    df, x = sdg_classification(haystackdoc=allDocuments['documents'],
+                    df, x = sdg_classification(haystack_doc=all_documents['documents'],
                                                 threshold= threshold)
                     df = df.drop(['Relevancy'], axis = 1)
                     sdg_labels = x.SDG.unique()[::-1]
-                    textrankkeywordlist = []
+                    textrank_keyword_list = []
                     for label in sdg_labels:
                         sdgdata = " ".join(df[df.SDG == label].text.to_list())
                         textranklist_ = textrank(textdata=sdgdata, words= top_n)
                         if len(textranklist_) > 0:
-                            textrankkeywordlist.append({'SDG':label, 'TextRank Keywords':",".join(textranklist_)})
-                    tRkeywordsDf = pd.DataFrame(textrankkeywordlist)
+                            textrank_keyword_list.append({'SDG':label, 'TextRank Keywords':",".join(textranklist_)})
+                    tRkeywordsDf = pd.DataFrame(textrank_keyword_list)
 
 
                     plt.rcParams['font.size'] = 25

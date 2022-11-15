@@ -25,7 +25,7 @@ except ImportError:
 
 def runLexicalPreprocessingPipeline(file_path,file_name,
                         split_by: Literal["sentence", "word"] = 'word', 
-                        split_length:int = 80, removePunc:bool = False, 
+                        split_length:int = 80, remove_punc:bool = False, 
                         split_overlap:int = 0 )->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
@@ -61,7 +61,7 @@ def runLexicalPreprocessingPipeline(file_path,file_name,
     output_lexical_pre = lexical_processing_pipeline.run(file_paths = file_path, 
                             params= {"FileConverter": {"file_path": file_path, \
                                         "file_name": file_name}, 
-                                        "UdfPreProcessor": {"removePunc": removePunc, \
+                                        "UdfPreProcessor": {"remove_punc": remove_punc, \
                                             "split_by": split_by, \
                                             "split_length":split_length,\
                                             "split_overlap": split_overlap}})
@@ -223,12 +223,23 @@ def lexical_search(query:Text,top_k:int, documents:List[Document]):
     retriever = TfidfRetriever(document_store)
     results = retriever.retrieve(query=query, top_k = top_k)          
     query_tokens = tokenize_lexical_query(query)
+    flag = True
     for count, result in enumerate(results):
         matches, doc = runSpacyMatcher(query_tokens,result.content)
+
         if len(matches) != 0:
+            if flag:
+                flag = False
+                if check_streamlit:
+                    st.markdown("##### Top few lexical search (TFIDF) hits #####")
+                else:
+                    print("Top few lexical search (TFIDF) hits")
+            
             if check_streamlit():
                 st.write("Result {}".format(count+1))
             else:
                 print("Results {}".format(count +1))
             spacyAnnotator(matches, doc)
-        
+
+    if flag:
+        st.info("🤔 No relevant result found. Please try another keyword.")    

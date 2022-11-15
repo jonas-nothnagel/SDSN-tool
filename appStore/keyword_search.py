@@ -6,7 +6,7 @@ import streamlit as st
 import json
 import logging
 from utils.lexical_search import runLexicalPreprocessingPipeline, lexical_search
-from utils.semantic_search import runSemanticPreprocessingPipeline, semantic_search
+from utils.semantic_search import runSemanticPreprocessingPipeline, semantic_keywordsearch
 from utils.checkconfig import getconfig
 
 # Declare all the necessary variables
@@ -21,6 +21,7 @@ embedding_model = config.get('semantic_search','RETRIEVER')
 embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
 embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
 embedding_dim  = int(config.get('semantic_search','EMBEDDING_DIM'))
+max_seq_len = int(config.get('semantic_search','MAX_SEQ_LENGTH')) 
 retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
 reader_model = config.get('semantic_search','READER')
 reader_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
@@ -100,7 +101,7 @@ def app():
                 if 'filepath' in st.session_state:
                       
                     if searchtype:
-                        allDocuments = runLexicalPreprocessingPipeline(
+                        all_documents = runLexicalPreprocessingPipeline(
                                     file_name=st.session_state['filename'],
                                     file_path=st.session_state['filepath'],
                                     split_by=lexical_split_by,
@@ -110,13 +111,12 @@ def app():
                         logging.info("performing lexical search")
                         with st.spinner("Performing Exact matching search \
                                         (Lexical search) for you"):
-                            st.markdown("##### Top few lexical search (TFIDF) hits #####")
                             lexical_search(
                                 query=queryList,
-                                documents = allDocuments['documents'],
+                                documents = all_documents['documents'],
                                 top_k = lexical_top_k )
                     else:
-                        allDocuments = runSemanticPreprocessingPipeline(
+                        all_documents = runSemanticPreprocessingPipeline(
                                             file_path= st.session_state['filepath'],
                                             file_name  = st.session_state['filename'],
                                             split_by=split_by,
@@ -124,20 +124,21 @@ def app():
                                             split_overlap=split_overlap,
                                             removePunc= remove_punc,
                         split_respect_sentence_boundary=split_respect_sentence_boundary)
-                        if len(allDocuments['documents']) > 100:
+                        if len(all_documents['documents']) > 100:
                             warning_msg = ": This might take sometime, please sit back and relax."
                         else:
                             warning_msg = ""
 
                         logging.info("starting semantic search")
                         with st.spinner("Performing Similar/Contextual search{}".format(warning_msg)):
-                            semantic_search(query = queryList, 
-                            documents = allDocuments['documents'],
+                            semantic_keywordsearch(query = queryList, 
+                            documents = all_documents['documents'],
                             embedding_model=embedding_model, 
                             embedding_layer=embedding_layer,
                             embedding_model_format=embedding_model_format,
                             reader_model=reader_model,reader_top_k=reader_top_k,
-                            retriever_top_k=retriever_top_k, embedding_dim=embedding_dim)
+                            retriever_top_k=retriever_top_k, embedding_dim=embedding_dim,
+                            max_seq_len=max_seq_len)
 
                 else:
                     st.info("🤔 No document found, please try to upload it at the sidebar!")

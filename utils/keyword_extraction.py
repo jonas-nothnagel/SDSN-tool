@@ -58,7 +58,7 @@ def extract_topn_from_vector(feature_names, sorted_items, top_n=10):
     return results
 
 
-def tfidfKeyword(textdata, vectorizer, tfidfmodel, top_n):
+def tfidf_keyword(textdata, vectorizer, tfidfmodel, top_n):
     """
     TFIDF based keywords extraction
     
@@ -81,7 +81,7 @@ def tfidfKeyword(textdata, vectorizer, tfidfmodel, top_n):
     keywords = [keyword for keyword in results]
     return keywords
 
-def keywordExtraction(sdg:int,sdgdata:List[Text]):
+def keyword_extraction(sdg:int,sdgdata:List[Text], top_n:int=10):
     """
     TFIDF based keywords extraction
     
@@ -102,7 +102,7 @@ def keywordExtraction(sdg:int,sdgdata:List[Text]):
     features = vectorizer.get_feature_names_out()
     tf_idf_vector=tfidfmodel.transform(vectorizer.transform(sdgdata))
     sorted_items=sort_coo(tf_idf_vector.tocoo())
-    top_n = int(config.get('tfidf', 'TOP_N'))
+    top_n = top_n
     results=extract_topn_from_vector(features,sorted_items,top_n)
     keywords = [keyword for keyword in results]
     return keywords

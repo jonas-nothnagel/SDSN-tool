@@ -120,7 +120,7 @@ class FileConverter(BaseComponent):
         return
 
 
-def basic(s, removePunc:bool = False):
+def basic(s, remove_punc:bool = False):
 
     """
     Performs basic cleaning of text.
@@ -141,7 +141,7 @@ def basic(s, removePunc:bool = False):
     s = re.sub('\n', ' ', s) 
 
     # Remove punctuations
-    if removePunc == True:
+    if remove_punc == True:
       translator = str.maketrans(' ', ' ', string.punctuation) 
       s = s.translate(translator)
     # Remove distracting single quotes and dotted pattern
@@ -164,7 +164,7 @@ class UdfPreProcessor(BaseComponent):
     """
     outgoing_edges = 1
 
-    def run(self, documents:List[Document], removePunc:bool, 
+    def run(self, documents:List[Document], remove_punc:bool, 
             split_by: Literal["sentence", "word"] = 'sentence',
             split_respect_sentence_boundary = False,
             split_length:int = 2, split_overlap:int = 0):
@@ -220,7 +220,7 @@ class UdfPreProcessor(BaseComponent):
             # i = basic(i)
             docs_processed = preprocessor.process([i])
             for item in docs_processed:
-                item.content = basic(item.content, removePunc= removePunc)
+                item.content = basic(item.content, remove_punc= remove_punc)
 
         df = pd.DataFrame(docs_processed)
         all_text = " ".join(df.content.to_list())
@@ -248,12 +248,12 @@ def processingpipeline():
     """
 
     preprocessing_pipeline = Pipeline()
-    fileconverter = FileConverter()
-    customPreprocessor = UdfPreProcessor()
+    file_converter = FileConverter()
+    custom_preprocessor = UdfPreProcessor()
 
-    preprocessing_pipeline.add_node(component=fileconverter, 
+    preprocessing_pipeline.add_node(component=file_converter, 
                                     name="FileConverter", inputs=["File"])
-    preprocessing_pipeline.add_node(component = customPreprocessor, 
+    preprocessing_pipeline.add_node(component = custom_preprocessor, 
                             name ='UdfPreProcessor', inputs=["FileConverter"])
 
     return preprocessing_pipeline
