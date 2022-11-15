@@ -20,6 +20,7 @@ remove_punc = bool(int(config.get('semantic_search','REMOVE_PUNC')))
 embedding_model = config.get('semantic_search','RETRIEVER')
 embedding_model_format = config.get('semantic_search','RETRIEVER_FORMAT')
 embedding_layer = int(config.get('semantic_search','RETRIEVER_EMB_LAYER'))
+embedding_dim  = int(config.get('semantic_search','EMBEDDING_DIM'))
 retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
 reader_model = config.get('semantic_search','READER')
 reader_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
@@ -97,8 +98,7 @@ def app():
                 logging.warning("Terminated as no keyword provided")
             else:
                 if 'filepath' in st.session_state:
-                    
-                    
+                      
                     if searchtype:
                         allDocuments = runLexicalPreprocessingPipeline(
                                     file_name=st.session_state['filename'],
@@ -137,7 +137,7 @@ def app():
                             embedding_layer=embedding_layer,
                             embedding_model_format=embedding_model_format,
                             reader_model=reader_model,reader_top_k=reader_top_k,
-                            retriever_top_k=retriever_top_k)
+                            retriever_top_k=retriever_top_k, embedding_dim=embedding_dim)
 
                 else:
                     st.info("🤔 No document found, please try to upload it at the sidebar!")

@@ -4,20 +4,41 @@ sys.path.append('../utils')
 
 import streamlit as st
 import ast
+import logging
+from utils.ndc_explorer import countrySpecificCCA, countrySpecificCCM
+from utils.checkconfig import getconfig
+from utils.semantic_search import runSemanticPreprocessingPipeline
+
 
 # Reading data and Declaring necessary variables
 with open('docStore/ndcs/countryList.txt') as dfile:
-        countryList = dfile.read()
+    countryList = dfile.read()
 countryList = ast.literal_eval(countryList)
 countrynames = list(countryList.keys())
     
 with open('docStore/ndcs/cca.txt', encoding='utf-8', errors='ignore') as dfile:
-            cca_sent = dfile.read()
+    cca_sent = dfile.read()
 cca_sent = ast.literal_eval(cca_sent)
             
 with open('docStore/ndcs/ccm.txt', encoding='utf-8', errors='ignore') as dfile:
     ccm_sent = dfile.read()
 ccm_sent = ast.literal_eval(ccm_sent)
+
+config = getconfig('paramconfig.cfg')
+split_by = config.get('coherence','SPLIT_BY')
+split_length = int(config.get('coherence','SPLIT_LENGTH'))
+split_overlap = int(config.get('coherence','SPLIT_OVERLAP'))
+split_respect_sentence_boundary = bool(int(config.get('coherence',
+                                    'RESPECT_SENTENCE_BOUNDARY')))
+remove_punc = bool(int(config.get('coherence','REMOVE_PUNC')))
+embedding_model = config.get('coherence','RETRIEVER')
+embedding_model_format = config.get('coherence','RETRIEVER_FORMAT')
+embedding_layer = int(config.get('coherence','RETRIEVER_EMB_LAYER'))
+embedding_dim  = int(config.get('coherence','EMBEDDING_DIM'))
+retriever_top_k = int(config.get('coherence','RETRIEVER_TOP_K'))
+reader_model = config.get('coherence','READER')
+reader_top_k = int(config.get('coherence','RETRIEVER_TOP_K'))
+
 
 def app():
 
@@ -55,6 +76,43 @@ def app():
             indicator is based on vector similarities in which only paragraphs \
             with similarity above 0.55  to the indicators are considered. """)
     
-    option = st.sidebar.selectbox('Select Country', (countrynames))
-    countryCode = countryList[option]
+    with st.sidebar:
+
+        option = st.selectbox('Select Country', (countrynames))
+        countryCode = countryList[option]
+        st.markdown("---")
     
+    with st.container():
+        if st.button("Check Coherence"):
+            sent_cca = countrySpecificCCA(cca_sent,1,countryCode)
+            sent_ccm = countrySpecificCCM(ccm_sent,1,countryCode)
+
+            if 'filepath' in st.session_state:
+                allDocuments = runSemanticPreprocessingPipeline(
+                                            file_path= st.session_state['filepath'],
+                                            file_name  = st.session_state['filename'],
+                                            split_by=split_by,
+                                            split_length= split_length,
+                                            split_overlap=split_overlap,
+                                            removePunc= remove_punc,
+                        split_respect_sentence_boundary=split_respect_sentence_boundary)
+                genre = st.radio( "Select Category",('Climate Change Adaptation', 'Climate Change Mitigation'))
+                if genre == 'Climate Change Adaptation':
+                    sent_dict = sent_cca
+                else:
+                    sent_dict = sent_ccm
+                sent_labels = []
+                for key,sent in sent_dict.items():
+                            sent_labels.append(sent)
+                if len(allDocuments['documents']) > 100:
+                            warning_msg = ": This might take sometime, please sit back and relax."
+                else:
+                    warning_msg = ""
+                logging.info("starting Coherence analysis, country selected {}".format(option))
+                with st.spinner("Performing Similar/Contextual search{}".format(warning_msg)):
+                    pass
+
+                
+            else:
+                st.info("🤔 No document found, please try to upload it at the sidebar!")
+                logging.warning("Terminated as no document provided")

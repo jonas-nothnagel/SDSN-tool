@@ -63,6 +63,7 @@ class QueryCheck(BaseComponent):
         else:
             output = {"query": "find all issues related to {}".format(query),
                       "query_type": 'statements/keyword'}
+        logging.info(output)
         return output, "output_1"
     
     def run_batch(self, query):
@@ -154,7 +155,8 @@ def loadRetriever(embedding_model:Text =  None, embedding_model_format:Text = No
     return retriever
 
 @st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
-def createDocumentStore(documents:List[Document], similarity:str = 'cosine'):
+def createDocumentStore(documents:List[Document], similarity:str = 'dot_product', 
+                            embedding_dim:int = 768):
     """
     Creates the InMemory Document Store from haystack list of Documents.
     It is  mandatory component for Retriever to work in Haystack frame work.
@@ -164,13 +166,17 @@ def createDocumentStore(documents:List[Document], similarity:str = 'cosine'):
     documents: List of haystack document. If using the preprocessing pipeline, 
     can be fetched key = 'documents; on output of preprocessing pipeline.
     similarity: scoring function, can be either 'cosine' or 'dot_product'
+    embedding_dim: Document store has default value of embedding size = 768, and
+    update_embeddings method of Docstore cannot infer the embedding size of 
+    retiever automaticallu, therefore set this value as per the model card.
     
     Return
     -------
     document_store: InMemory Document Store object type.
     
     """
-    document_store = InMemoryDocumentStore(similarity = similarity)
+    document_store = InMemoryDocumentStore(similarity = similarity, 
+                                        embedding_dim = embedding_dim )
     document_store.write_documents(documents)
     
     return document_store
@@ -178,9 +184,10 @@ def createDocumentStore(documents:List[Document], similarity:str = 'cosine'):
 
 @st.cache(hash_funcs={"builtins.SwigPyObject": lambda _: None},allow_output_mutation=True)
 def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  None, 
-                embedding_model_format:Text = None, 
+                useQueryCheck = True, embedding_model_format:Text = None, 
                  embedding_layer:int = None,  retriever_top_k:int = 10,
-                 reader_model:str =  None, reader_top_k:int = 10):
+                 reader_model:str =  None, reader_top_k:int = 10,
+                 embedding_dim:int = 768):
     """
     creates the semantic search pipeline and document Store object from the
     list of haystack documents. The top_k for the Reader and Retirever are kept  
@@ -207,6 +214,11 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
     reader_top_k: Reader will use retrieved results to further find better matches.
                 As purpose here is to use reader to extract context, the value is
                 same as retriever_top_k.
+    useQueryCheck: Whether to use the querycheck which modifies the query or not.
+    embedding_dim: Document store has default value of embedding size = 768, and
+    update_embeddings method of Docstore cannot infer the embedding size of 
+    retiever automaticallu, therefore set this value as per the model card.
+
 
     Return
     ---------
@@ -219,7 +231,8 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
     embeddings of each paragraph in document store.
 
     """
-    document_store = createDocumentStore(documents)                  
+    document_store = createDocumentStore(documents=documents, 
+                                    embedding_dim=embedding_dim)                  
     retriever = loadRetriever(embedding_model = embedding_model,
                     embedding_model_format=embedding_model_format,
                     embedding_layer=embedding_layer,  
@@ -227,17 +240,22 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
                     document_store = document_store)
                 
     document_store.update_embeddings(retriever)
-    querycheck = QueryCheck()
     reader = FARMReader(model_name_or_path=reader_model,
                     top_k = reader_top_k, use_gpu=True)
-
     semanticsearch_pipeline = Pipeline()
-    semanticsearch_pipeline.add_node(component = querycheck, name = "QueryCheck",
-                                    inputs = ["Query"])
-    semanticsearch_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
-                                    inputs = ["QueryCheck.output_1"])
-    semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
-                                    inputs= ["EmbeddingRetriever"])
+    if useQueryCheck:
+        querycheck = QueryCheck()
+        semanticsearch_pipeline.add_node(component = querycheck, name = "QueryCheck",
+                                        inputs = ["Query"])
+        semanticsearch_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
+                                        inputs = ["QueryCheck.output_1"])
+        semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
+                                        inputs= ["EmbeddingRetriever"])
+    else:
+        semanticsearch_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
+                                        inputs = ["Query"])
+        semanticsearch_pipeline.add_node(component = reader, name = "FARMReader",
+                                        inputs= ["EmbeddingRetriever"])
 
     return semanticsearch_pipeline, document_store
 
@@ -281,7 +299,8 @@ def semanticsearchAnnotator(matches: List[List[int]], document):
 def semantic_search(query:Text,documents:List[Document],embedding_model:Text, 
                 embedding_model_format:Text, 
                  embedding_layer:int,  reader_model:str,
-                 retriever_top_k:int = 10, reader_top_k:int = 10):
+                 retriever_top_k:int = 10, reader_top_k:int = 10,
+                 return_results:bool = False, embedding_dim:int = 768):
     """
     Performs the Semantic search on the List of haystack documents which is 
     returned by preprocessing Pipeline.
@@ -297,22 +316,24 @@ def semantic_search(query:Text,documents:List[Document],embedding_model:Text,
                         embedding_layer= embedding_layer,
                         embedding_model_format= embedding_model_format,
                         reader_model= reader_model, retriever_top_k= retriever_top_k,
-                        reader_top_k= reader_top_k)
+                        reader_top_k= reader_top_k, embedding_dim=embedding_dim)
 
     results = semanticsearch_pipeline.run(query = query)
-
-    if check_streamlit:
-        st.markdown("##### Top few semantic search results #####")
+    if return_results:
+        return results
     else:
-        print("Top few semantic search results")
-    for i,answer in enumerate(results['answers']):
-        temp = answer.to_dict()
-        start_idx = temp['offsets_in_document'][0]['start']
-        end_idx = temp['offsets_in_document'][0]['end']
-        match = [[start_idx,end_idx]]
-        doc = doc_store.get_document_by_id(temp['document_id']).content
         if check_streamlit:
-            st.write("Result {}".format(i+1))
+            st.markdown("##### Top few semantic search results #####")
         else:
-            print("Result {}".format(i+1))
-        semanticsearchAnnotator(match, doc)
+            print("Top few semantic search results")
+        for i,answer in enumerate(results['answers']):
+            temp = answer.to_dict()
+            start_idx = temp['offsets_in_document'][0]['start']
+            end_idx = temp['offsets_in_document'][0]['end']
+            match = [[start_idx,end_idx]]
+            doc = doc_store.get_document_by_id(temp['document_id']).content
+            if check_streamlit:
+                st.write("Result {}".format(i+1))
+            else:
+                print("Result {}".format(i+1))
+            semanticsearchAnnotator(match, doc)
