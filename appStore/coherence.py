@@ -6,16 +6,16 @@ import streamlit as st
 import ast
 
 # Reading data and Declaring necessary variables
-with open('ndcs/countryList.txt') as dfile:
+with open('docStore/ndcs/countryList.txt') as dfile:
         countryList = dfile.read()
 countryList = ast.literal_eval(countryList)
 countrynames = list(countryList.keys())
     
-with open('ndcs/cca.txt', encoding='utf-8', errors='ignore') as dfile:
+with open('docStore/ndcs/cca.txt', encoding='utf-8', errors='ignore') as dfile:
             cca_sent = dfile.read()
 cca_sent = ast.literal_eval(cca_sent)
             
-with open('ndcs/ccm.txt', encoding='utf-8', errors='ignore') as dfile:
+with open('docStore/ndcs/ccm.txt', encoding='utf-8', errors='ignore') as dfile:
     ccm_sent = dfile.read()
 ccm_sent = ast.literal_eval(ccm_sent)
 
