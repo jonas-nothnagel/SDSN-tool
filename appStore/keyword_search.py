@@ -47,8 +47,20 @@ def app():
             policy document - developed by GIZ Data and the \
             Sustainable Development Solution Network.
             """)
+        st.write(""" The application allows its user to perform a keyword search\
+             based on two options: a lexical (TFIDF) search and semantic  \
+             bi-encoder search. The difference between both approaches is quite \
+            straightforward; while the lexical search only displays paragraphs \
+            in the document with exact matching results, the semantic search \
+            shows paragraphs with meaningful connections (e.g., synonyms) based\
+            on the context as well. The semantic search allows for a personalized\
+            experience in using the application. Both methods employ a \
+            probabilistic retrieval framework in its identification of relevant \
+            paragraphs. By defualt the search is perfomred using 'Semantic Search'
+            , to find 'Exact/Lexical Matches' checkbox is provided, which will \
+            by pass semantic search.. Furthermore, the application allows the \
+            user to search for pre-defined keywords from different thematic buckets""")
 
-        st.markdown("")
     
     with st.sidebar:
         with open('docStore/sample/keywordexample.json','r') as json_file:
@@ -57,14 +69,6 @@ def app():
         genre = st.radio("Select Keyword Category", list(keywordexample.keys()))
         if genre:
             keywordList = keywordexample[genre]
-        # elif genre == 'Climate':
-        #     keywordList = keywordexample['Climate']
-        # elif genre == 'Social':
-        #     keywordList = keywordexample['Social']
-        # elif genre == 'Nature':
-        #     keywordList = keywordexample['Nature']
-        # elif genre == 'Implementation':
-        #     keywordList = keywordexample['Implementation']
         else:
             keywordList = None
         
@@ -76,17 +80,18 @@ def app():
         st.markdown("---")
     
     with st.container():
-        if keywordList is not None:
-            queryList = st.text_input("You selcted the {} category we \
-                        will look for these keywords in document".format(genre),
-                                    value="{}".format(keywordList))
-        else:
-            queryList = st.text_input("Please enter here your question and we \
-                                        will look for an answer in the document\
-                                        OR enter the keyword you are looking \
-                                        for and we will we will look for similar\
-                                        context in the document.",
-                                    placeholder="Enter keyword here")
+        # if keywordList is not None:
+        #     queryList = st.text_input("You selected the {} category we \
+        #                 will look for these keywords in document".format(genre),
+        #                             value="{}".format(keywordList))
+        # else:
+        queryList = st.text_input("Please enter here your question and we \
+                                    will look for an answer in the document\
+                                    OR enter the keyword you are looking \
+                                    for and we will we will look for similar\
+                                    context in the document. You can select the \
+                                    presets of keywords from sidebar.",
+                                placeholder="Enter keyword here")
         searchtype = st.checkbox("Show only Exact Matches")
         if st.button("Find them"):
 
@@ -105,7 +110,7 @@ def app():
                                     split_by=lexical_split_by,
                                     split_length=lexical_split_length,
                                     split_overlap=lexical_split_overlap,
-                                    removePunc=lexical_remove_punc), 
+                                    removePunc=lexical_remove_punc)
                         logging.info("performing lexical search")
                         with st.spinner("Performing Exact matching search \
                                         (Lexical search) for you"):
