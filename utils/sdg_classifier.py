@@ -94,7 +94,7 @@ def sdg_classification(haystack_doc:List[Document],
     """
     logging.info("Working on SDG Classification")
     if not classifier_model:
-        if check_streamlit:
+        if check_streamlit():
             classifier_model = st.session_state['sdg_classifier']
         else:
             logging.warning("No streamlit envinornment found, Pass the classifier")

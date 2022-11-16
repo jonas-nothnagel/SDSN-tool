@@ -230,7 +230,7 @@ def lexical_search(query:Text,top_k:int, documents:List[Document]):
         if len(matches) != 0:
             if flag:
                 flag = False
-                if check_streamlit:
+                if check_streamlit():
                     st.markdown("##### Top few lexical search (TFIDF) hits #####")
                 else:
                     print("Top few lexical search (TFIDF) hits")
@@ -242,4 +242,7 @@ def lexical_search(query:Text,top_k:int, documents:List[Document]):
             spacyAnnotator(matches, doc)
 
     if flag:
-        st.info("🤔 No relevant result found. Please try another keyword.")    
+        if check_streamlit():
+            st.info("🤔 No relevant result found. Please try another keyword.")
+        else:
+            print("No relevant result found. Please try another keyword.")   

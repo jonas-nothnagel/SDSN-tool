@@ -107,13 +107,12 @@ def app():
                                     split_by=lexical_split_by,
                                     split_length=lexical_split_length,
                                     split_overlap=lexical_split_overlap,
-                                    removePunc=lexical_remove_punc)
+                                    remove_punc=lexical_remove_punc)
                         logging.info("performing lexical search")
                         with st.spinner("Performing Exact matching search \
                                         (Lexical search) for you"):
-                            lexical_search(
-                                query=queryList,
-                                documents = all_documents['documents'],
+                            lexical_search(query=queryList,
+                        documents = all_documents['documents'],
                                 top_k = lexical_top_k )
                     else:
                         all_documents = runSemanticPreprocessingPipeline(
@@ -122,7 +121,7 @@ def app():
                                             split_by=split_by,
                                             split_length= split_length,
                                             split_overlap=split_overlap,
-                                            removePunc= remove_punc,
+                                            remove_punc= remove_punc,
                         split_respect_sentence_boundary=split_respect_sentence_boundary)
                         if len(all_documents['documents']) > 100:
                             warning_msg = ": This might take sometime, please sit back and relax."
