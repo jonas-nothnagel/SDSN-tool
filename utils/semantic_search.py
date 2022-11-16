@@ -254,7 +254,7 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
     reader = FARMReader(model_name_or_path=reader_model,
                     top_k = reader_top_k, use_gpu=True)
     semantic_search_pipeline = Pipeline()
-    if useQueryCheck:
+    if useQueryCheck and reader_model:
         querycheck = QueryCheck()
         semantic_search_pipeline.add_node(component = querycheck, name = "QueryCheck",
                                         inputs = ["Query"])
@@ -262,11 +262,15 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
                                         inputs = ["QueryCheck.output_1"])
         semantic_search_pipeline.add_node(component = reader, name = "FARMReader",
                                         inputs= ["EmbeddingRetriever"])
-    else:
+    elif reader_model :
         semantic_search_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
                                         inputs = ["Query"])
         semantic_search_pipeline.add_node(component = reader, name = "FARMReader",
                                         inputs= ["EmbeddingRetriever"])
+    else:
+        semantic_search_pipeline.add_node(component = retriever, name = "EmbeddingRetriever",
+                                        inputs = ["Query"])
+
 
     return semantic_search_pipeline, document_store
 
