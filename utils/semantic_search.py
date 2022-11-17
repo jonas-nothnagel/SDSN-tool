@@ -573,5 +573,5 @@ def semantic_keywordsearch(query:Text,documents:List[Document],
                 st.write("Result {}".format(i+1))
             else:
                 print("Result {}".format(i+1))
-            semanticsearchAnnotator(results_df.loc[i]['context_offset'],
+            semanticsearchAnnotator([results_df.loc[i]['context_offset']],
                         results_df.loc[i]['content'] )
