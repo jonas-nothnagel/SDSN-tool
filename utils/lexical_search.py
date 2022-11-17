@@ -7,7 +7,7 @@ import streamlit as st
 from markdown import markdown
 from annotated_text import annotation
 from haystack.schema import Document
-from typing import List, Text
+from typing import List, Text, Tuple
 from typing_extensions import Literal
 from utils.preprocessing import processingpipeline
 from utils.streamlitcheck import check_streamlit
@@ -23,10 +23,10 @@ except ImportError:
     logging.info("Streamlit not installed")
 
 
-def runLexicalPreprocessingPipeline(file_path,file_name,
+def runLexicalPreprocessingPipeline(file_name:str,file_path:str,
                         split_by: Literal["sentence", "word"] = 'word', 
-                        split_length:int = 80, remove_punc:bool = False, 
-                        split_overlap:int = 0 )->List[Document]:
+                        split_length:int = 80, split_overlap:int = 0, 
+                        remove_punc:bool = False,)->List[Document]:
     """
     creates the pipeline and runs the preprocessing pipeline, 
     the params for pipeline are fetched from paramconfig. As lexical doesnt gets
@@ -40,11 +40,14 @@ def runLexicalPreprocessingPipeline(file_path,file_name,
     st.session_state['filename']
     file_path: filepath, in case of streamlit application use 
     st.session_state['filepath']
-    removePunc: to remove all Punctuation including ',' and '.' or not
     split_by: document splitting strategy either as word or sentence
     split_length: when synthetically creating the paragrpahs from document,
                     it defines the length of paragraph.
+    split_overlap: Number of words or sentences that overlap when creating
+        the paragraphs. This is done as one sentence or 'some words' make sense
+        when  read in together with others. Therefore the overlap is used.
     splititng of text.
+    removePunc: to remove all Punctuation including ',' and '.' or not
 
     Return
     --------------
@@ -91,7 +94,8 @@ def tokenize_lexical_query(query:str)-> List[str]:
                   if not (token.is_stop or token.is_punct)]
     return token_list
 
-def runSpacyMatcher(token_list:List[str], document:Text):
+def runSpacyMatcher(token_list:List[str], document:Text
+                    )->Tuple(List[List[int]],spacy.tokens.doc.Doc):
     """
     Using the spacy in backend finds the keywords in the document using the 
     Matcher class from spacy. We can alternatively use the regex, but spacy
@@ -203,7 +207,7 @@ def spacyAnnotator(matches: List[List[int]], document:spacy.tokens.doc.Doc):
     else:
         print(annotated_text)
 
-def lexical_search(query:Text,top_k:int, documents:List[Document]):
+def lexical_search(query:Text, documents:List[Document],top_k:int):
     """
     Performs the Lexical search on the List of haystack documents which is 
     returned by preprocessing Pipeline.

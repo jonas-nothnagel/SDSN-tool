@@ -120,7 +120,7 @@ class FileConverter(BaseComponent):
         return
 
 
-def basic(s, remove_punc:bool = False):
+def basic(s:str, remove_punc:bool = False):
 
     """
     Performs basic cleaning of text.
@@ -164,10 +164,10 @@ class UdfPreProcessor(BaseComponent):
     """
     outgoing_edges = 1
 
-    def run(self, documents:List[Document], remove_punc:bool, 
+    def run(self, documents:List[Document], remove_punc:bool=False, 
             split_by: Literal["sentence", "word"] = 'sentence',
-            split_respect_sentence_boundary = False,
-            split_length:int = 2, split_overlap:int = 0):
+            split_length:int = 2, split_respect_sentence_boundary:bool = False,
+            split_overlap:int = 0):
 
         """ this is required method to invoke the component in 
         the pipeline implementation. 
@@ -175,7 +175,7 @@ class UdfPreProcessor(BaseComponent):
         Params
         ----------
         documents: documents from the output dictionary returned by Fileconverter
-        removePunc: to remove all Punctuation including ',' and '.' or not
+        remove_punc: to remove all Punctuation including ',' and '.' or not
         split_by: document splitting strategy either as word or sentence
         split_length: when synthetically creating the paragrpahs from document,
                       it defines the length of paragraph.

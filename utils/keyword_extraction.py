@@ -58,7 +58,7 @@ def extract_topn_from_vector(feature_names, sorted_items, top_n=10):
     return results
 
 
-def tfidf_keyword(textdata, vectorizer, tfidfmodel, top_n):
+def tfidf_keyword(textdata:str, vectorizer, tfidfmodel, top_n):
     """
     TFIDF based keywords extraction
     
@@ -108,7 +108,7 @@ def keyword_extraction(sdg:int,sdgdata:List[Text], top_n:int=10):
     return keywords
 
 @st.cache(allow_output_mutation=True)
-def textrank(textdata:Text, ratio:float = 0.1, words = 0):
+def textrank(textdata:Text, ratio:float = 0.1, words:int = 0)->List[str]:
     """
     wrappper function to perform textrank, uses either ratio or wordcount to
     extract top keywords limited by words or ratio.
