@@ -128,7 +128,8 @@ def app():
                             max_seq_len=max_seq_len, useQueryCheck=False)
                     raw_output = runSemanticPipeline(pipeline=semanticsearch_pipeline,queries=sent_labels)
                     results_df = process_semantic_output(raw_output)
-                    AgGrid(results_df, reload_data = False, update_mode="value_changed",
+                    data = results_df.drop(['answer','answer_offset','context_offset','context','retriever_score'])
+                    AgGrid(data, reload_data = False, update_mode="value_changed",
                     columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS)
                     
             else:
