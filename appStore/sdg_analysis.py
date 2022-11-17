@@ -34,7 +34,7 @@ def app():
 
     #### APP INFO #####
     with st.container():
-        st.markdown("<h2 style='text-align: center; color: black;'> SDG Classification and Keyphrase Extraction </h2>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; color: black;'> SDG Classification and Keyphrase Extraction </h1>", unsafe_allow_html=True)
         st.write(' ')
         st.write(' ')
 

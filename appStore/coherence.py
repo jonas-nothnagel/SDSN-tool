@@ -128,11 +128,16 @@ def app():
                             max_seq_len=max_seq_len, useQueryCheck=False)
                     raw_output = runSemanticPipeline(pipeline=semanticsearch_pipeline,queries=sent_labels)
                     results_df = process_semantic_output(raw_output)
-                    data = results_df.drop(['answer','answer_offset',
-                                'context_offset','context','retriever_score'],
+                    results_df = results_df.drop(['answer','answer_offset',
+                                'context_offset','context','reader_score','id'],
                                 axis = 1)
-                    AgGrid(data, reload_data = False, update_mode="value_changed",
-                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS)
+                    
+                    for i,key in enumerate(list(sent_dict.keys())):
+                        st.write("Relevant paragraphs for topic:{}".format(key))
+                        df = results_df[results_df['query']==sent_dict[key]].reset_index(drop=True)
+                        for j in range(3):
+                            st.write('Result {}.'.format(j+1))
+                            st.write(df.loc[j]['content']+'\n')
                     
             else:
                 st.info("🤔 No document found, please try to upload it at the sidebar!")
