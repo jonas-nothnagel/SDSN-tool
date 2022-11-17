@@ -101,7 +101,7 @@ def app():
                         split_by=split_by,
                         split_length= split_length,
                         split_overlap=split_overlap,
-                        removePunc= remove_punc,
+                        remove_punc= remove_punc,
                 split_respect_sentence_boundary=split_respect_sentence_boundary)
                 # genre = st.radio( "Select Category",('Climate Change Adaptation', 'Climate Change Mitigation'))
                 if genre == 'Climate Change Adaptation':
