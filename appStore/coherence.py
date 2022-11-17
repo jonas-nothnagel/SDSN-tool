@@ -7,8 +7,10 @@ import ast
 import logging
 from utils.ndc_explorer import countrySpecificCCA, countrySpecificCCM
 from utils.checkconfig import getconfig
-from utils.semantic_search import runSemanticPreprocessingPipeline
-
+from utils.semantic_search import runSemanticPreprocessingPipeline,process_semantic_output
+from utils.semantic_search import semanticSearchPipeline, runSemanticPipeline
+from st_aggrid import AgGrid
+from st_aggrid.shared import ColumnsAutoSizeMode
 
 # Reading data and Declaring necessary variables
 with open('docStore/ndcs/countryList.txt') as dfile:
@@ -35,9 +37,9 @@ embedding_model = config.get('coherence','RETRIEVER')
 embedding_model_format = config.get('coherence','RETRIEVER_FORMAT')
 embedding_layer = int(config.get('coherence','RETRIEVER_EMB_LAYER'))
 embedding_dim  = int(config.get('coherence','EMBEDDING_DIM'))
+max_seq_len = int(config.get('coherence','MAX_SEQ_LENGTH')) 
 retriever_top_k = int(config.get('coherence','RETRIEVER_TOP_K'))
-reader_model = config.get('coherence','READER')
-reader_top_k = int(config.get('coherence','RETRIEVER_TOP_K'))
+
 
 
 def app():
@@ -57,7 +59,8 @@ def app():
             coherence between a given policy document and a country’s (Intended)\
             Nationally Determined Contribution (INDCs/NDCs) using open-source \
             data from the German Institute of Development and Sustainability’s \
-            (IDOS) [NDC Explorer](https://klimalog.idos-research.de/ndc/#NDCExplorer/worldMap?NewAndUpdatedNDC??income???catIncome).\
+            (IDOS) [NDC Explorer]
+            (https://klimalog.idos-research.de/ndc/#NDCExplorer/worldMap?NewAndUpdatedNDC??income???catIncome).\
             """)
         st.write("")
         st.write(""" User can select a country context via the drop-down menu \
@@ -81,6 +84,10 @@ def app():
         option = st.selectbox('Select Country', (countrynames))
         countryCode = countryList[option]
         st.markdown("---")
+
+        genre = st.radio( "Select Category",('Climate Change Adaptation', 
+                                            'Climate Change Mitigation'))
+        st.markdown("---")
     
     with st.container():
         if st.button("Check Coherence"):
@@ -89,14 +96,14 @@ def app():
 
             if 'filepath' in st.session_state:
                 allDocuments = runSemanticPreprocessingPipeline(
-                                            file_path= st.session_state['filepath'],
-                                            file_name  = st.session_state['filename'],
-                                            split_by=split_by,
-                                            split_length= split_length,
-                                            split_overlap=split_overlap,
-                                            removePunc= remove_punc,
-                        split_respect_sentence_boundary=split_respect_sentence_boundary)
-                genre = st.radio( "Select Category",('Climate Change Adaptation', 'Climate Change Mitigation'))
+                        file_path= st.session_state['filepath'],
+                        file_name  = st.session_state['filename'],
+                        split_by=split_by,
+                        split_length= split_length,
+                        split_overlap=split_overlap,
+                        removePunc= remove_punc,
+                split_respect_sentence_boundary=split_respect_sentence_boundary)
+                # genre = st.radio( "Select Category",('Climate Change Adaptation', 'Climate Change Mitigation'))
                 if genre == 'Climate Change Adaptation':
                     sent_dict = sent_cca
                 else:
@@ -105,14 +112,25 @@ def app():
                 for key,sent in sent_dict.items():
                             sent_labels.append(sent)
                 if len(allDocuments['documents']) > 100:
-                            warning_msg = ": This might take sometime, please sit back and relax."
+                    warning_msg = ": This might take sometime, please sit back and relax."
                 else:
                     warning_msg = ""
-                logging.info("starting Coherence analysis, country selected {}".format(option))
-                with st.spinner("Performing Similar/Contextual search{}".format(warning_msg)):
-                    pass
-
-                
+                logging.info("starting Coherence analysis, \
+                    country selected {}".format(option))
+                with st.spinner("Performing Coherence Analysis for {} \
+                    under {} category{}".format(option,genre,warning_msg)):
+                    semanticsearch_pipeline, doc_store = semanticSearchPipeline(documents = allDocuments['documents'],
+                            embedding_model= embedding_model, 
+                            embedding_layer= embedding_layer,
+                            embedding_model_format= embedding_model_format,
+                            retriever_top_k= retriever_top_k,
+                            embedding_dim=embedding_dim,
+                            max_seq_len=max_seq_len, useQueryCheck=False)
+                    raw_output = runSemanticPipeline(pipeline=semanticsearch_pipeline,queries=sent_labels)
+                    results_df = process_semantic_output(raw_output)
+                    AgGrid(results_df, reload_data = False, update_mode="value_changed",
+                    columns_auto_size_mode = ColumnsAutoSizeMode.FIT_CONTENTS)
+                    
             else:
                 st.info("🤔 No document found, please try to upload it at the sidebar!")
                 logging.warning("Terminated as no document provided")
