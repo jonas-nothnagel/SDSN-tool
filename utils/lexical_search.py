@@ -95,7 +95,7 @@ def tokenize_lexical_query(query:str)-> List[str]:
     return token_list
 
 def runSpacyMatcher(token_list:List[str], document:Text
-                    )->Tuple(List[List[int]],spacy.tokens.doc.Doc):
+                    )->Tuple[List[List[int]],spacy.tokens.doc.Doc]:
     """
     Using the spacy in backend finds the keywords in the document using the 
     Matcher class from spacy. We can alternatively use the regex, but spacy
