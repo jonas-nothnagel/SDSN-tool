@@ -35,7 +35,7 @@ def checkbox_without_preselect(keylist):
         on_change = disable_other_checkboxes,
         args=tuple(list(filter(lambda x: x!= key_val, keylist))),)
     
-    for key,val in dict_:
+    for key,val in dict_.items():
         if val == True:
             return keylist[int(key)]
     
