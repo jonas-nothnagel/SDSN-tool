@@ -8,6 +8,7 @@ import logging
 from utils.lexical_search import runLexicalPreprocessingPipeline, lexical_search
 from utils.semantic_search import runSemanticPreprocessingPipeline, semantic_keywordsearch
 from utils.checkconfig import getconfig
+from utils.streamlitcheck import checkbox_without_preselect
 
 # Declare all the necessary variables
 config = getconfig('paramconfig.cfg')
@@ -44,7 +45,7 @@ def app():
 
         st.write(
             """     
-            The *Keyword Search* app is an easy-to-use interface \ 
+            The *Keyword Search* app is an easy-to-use interface \
             built in Streamlit for doing keyword search in \
             policy document - developed by GIZ Data and the \
             Sustainable Development Solution Network.
@@ -60,8 +61,8 @@ def app():
             allows for a personalized experience in using the application. Both \
             methods employ a probabilistic retrieval framework in its identification\
             of relevant paragraphs. By defualt the search is performed using \
-            'Semantic Search' to find 'Exact/Lexical Matches' please tick the \
-            checkbox provided, which will by pass semantic search.. Furthermore,\
+            'Semantic Search', and to find 'Exact/Lexical Matches' please tick the \
+            checkbox provided, which will by-pass semantic search. Furthermore,\
             the application allows the user to search for pre-defined keywords \
             from different thematic buckets present in sidebar.""")
 
@@ -70,7 +71,8 @@ def app():
         with open('docStore/sample/keywordexample.json','r') as json_file:
             keywordexample = json.load(json_file)
         
-        genre = st.radio("Select Keyword Category", list(keywordexample.keys()))
+        # genre = st.radio("Select Keyword Category", list(keywordexample.keys()))
+        genre = checkbox_without_preselect(list(keywordexample.keys()))
         if genre:
             keywordList = keywordexample[genre]
         else:
@@ -87,8 +89,8 @@ def app():
                                     will look for an answer in the document\
                                     OR enter the keyword you are looking \
                                     for and we will we will look for similar\
-                                    context in the document. You can select the \
-                                    presets of keywords from sidebar.",
+                                    context in the document. If dont have anything\
+                                    try the presets of keywords from sidebar. ",
                                     value = "{}".format(keywordList))
         searchtype = st.checkbox("Show only Exact Matches")
         if st.button("Find them"):

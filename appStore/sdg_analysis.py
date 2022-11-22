@@ -75,9 +75,9 @@ def app():
             paragraphs with a calculated relevancy score above 85%.  \n""")
 
         st.write("""**Keyphrase Extraction:** The application extracts 15 \
-            keyphrases from the document, calculates a respective relevancy \
-            score, and displays the results in a summary table. The keyphrases \
-            are extracted using using [Textrank](https://github.com/summanlp/textrank)\
+            keyphrases from the document, for each SDG label and displays the \
+            results in a summary table. The keyphrases are extracted using \
+            using [Textrank](https://github.com/summanlp/textrank)\
             which is an easy-to-use computational less expensive \
             model leveraging combination of TFIDF and Graph networks.
             """)

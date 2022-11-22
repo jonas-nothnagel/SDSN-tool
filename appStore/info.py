@@ -7,7 +7,7 @@ def app():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
     st.markdown("<h2 style='text-align: center;  \
-                      color: black;'> Policy Action Tracker Manual</h2>", 
+                      color: black;'> Climate Policy Action Tracker Manual</h2>", 
                       unsafe_allow_html=True)
 
     
@@ -79,12 +79,6 @@ def app():
         consequence, the open-source web application aims to support the process\
          through suitable AI-powered and NLP methods. In the following, the \
         application’s functionalities are explained in more detail.
-        <ul>
-        <li>Analizing the policy document</li>
-        <li>finding SDG related content</li> 
-        <li>Make it searchable</li>
-        <li>compare it to the national NDC</li>
-        </ul> 
     </div>
     <br>
     """
