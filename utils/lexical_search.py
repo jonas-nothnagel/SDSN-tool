@@ -3,7 +3,6 @@ from haystack.document_stores import InMemoryDocumentStore
 import spacy
 import re
 from spacy.matcher import Matcher
-import streamlit as st
 from markdown import markdown
 from annotated_text import annotation
 from haystack.schema import Document

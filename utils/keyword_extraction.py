@@ -49,8 +49,7 @@ def extract_topn_from_vector(feature_names, sorted_items, top_n=10):
         #keep track of feature name and its corresponding score
         score_vals.append(round(score, 3))
         feature_vals.append(feature_names[idx])
-    #create a tuples of feature,score
-    #results = zip(feature_vals,score_vals)
+
     results= {}
     for idx in range(len(feature_vals)):
         results[feature_vals[idx]]=score_vals[idx]
@@ -128,11 +127,6 @@ def textrank(textdata:Text, ratio:float = 0.1, words:int = 0)->List[str]:
     results: extracted keywords
     """
     if words == 0:
-        # try:
-        #     words = int(config.get('sdg','TOP_KEY'))
-        #     results = keywords.keywords(textdata, words = words).split("\n")    
-        # except Exception as e:
-        #     logging.warning(e)
         logging.info("Textrank using defulat ratio value = 0.1, as no words limit given")
         results = keywords.keywords(textdata, ratio= ratio).split("\n")
     else:

@@ -45,7 +45,7 @@ class MultiApp:
     def run(self):
         
         st.sidebar.write(format_func=lambda app: app['title'])
-        image = Image.open('docStore/img/giz_sdsn_small.jpg')
+        image = Image.open('docStore/img/sdsn.jpg')
         st.sidebar.image(image, width =200)
        
         with st.sidebar:
