@@ -538,7 +538,7 @@ def semantic_keywordsearch(query:Text,documents:List[Document],
                 embedding_layer:int,  reader_model:str,
                 retriever_top_k:int = 10, reader_top_k:int = 10,
                 return_results:bool = False, embedding_dim:int = 768,
-                max_seq_len:int = 512,
+                max_seq_len:int = 512,top_k_per_candidate:int =1,
                 sort_by:Literal["retriever", "reader"] = 'retriever'):
     """
     Performs the Semantic search on the List of haystack documents which is 
@@ -556,7 +556,8 @@ def semantic_keywordsearch(query:Text,documents:List[Document],
                         embedding_model_format= embedding_model_format,
                         reader_model= reader_model, retriever_top_k= retriever_top_k,
                         reader_top_k= reader_top_k, embedding_dim=embedding_dim,
-                        max_seq_len=max_seq_len)
+                        max_seq_len=max_seq_len,
+                        top_k_per_candidate=top_k_per_candidate)
 
     raw_output = runSemanticPipeline(semanticsearch_pipeline,query)
     results_df = process_semantic_output(raw_output)
