@@ -47,7 +47,7 @@ def app():
     #### APP INFO #####
     with st.container():
         st.markdown("<h1 style='text-align: center;  \
-                      color: black;'> Check NDC Coherence</h1>", 
+                      color: black;'> NDC Comparison</h1>", 
                       unsafe_allow_html=True)
         st.write(' ')
         st.write(' ')
@@ -55,12 +55,11 @@ def app():
 
         st.write(
             """     
-            The *Check NDC Coherence* application provides easy evaluation of 
+            The *NDC Comparison* application provides easy evaluation of 
             coherence between a given policy document and a country’s (Intended)\
             Nationally Determined Contribution (INDCs/NDCs) using open-source \
             data from the German Institute of Development and Sustainability’s \
-            (IDOS) [NDC Explorer]
-            (https://klimalog.idos-research.de/ndc/#NDCExplorer/worldMap?NewAndUpdatedNDC??income???catIncome).\
+            (IDOS) [NDC Explorer](https://klimalog.idos-research.de/ndc/#NDCExplorer/worldMap?NewAndUpdatedNDC??income???catIncome).\
             """)
         st.write("")
         st.write(""" User can select a country context via the drop-down menu \
@@ -76,8 +75,8 @@ def app():
             climate change mitigation (e.g., fossil fuel production, REDD+) and \
             22 indicators under climate change adaptation (e.g., sea level rise,\
             investment needs). The assignment of the paragraph to a corresponding\
-            indicator is based on vector similarities in which only paragraphs \
-            with similarity above 0.55  to the indicators are considered. """)
+            indicator is based on vector similarities in which top 3 results
+            if found are shown to the user. """)
     
     with st.sidebar:
 
@@ -90,7 +89,7 @@ def app():
         st.markdown("---")
     
     with st.container():
-        if st.button("Check Coherence"):
+        if st.button("Compare with NDC"):
             sent_cca = countrySpecificCCA(cca_sent,1,countryCode)
             sent_ccm = countrySpecificCCM(ccm_sent,1,countryCode)
 
@@ -133,7 +132,7 @@ def app():
                                 axis = 1)
                     
                     for i,key in enumerate(list(sent_dict.keys())):
-                        st.write("Relevant paragraphs for topic:{}".format(key))
+                        st.subheader("Relevant paragraphs for topic: {}".format(key))
                         df = results_df[results_df['query']==sent_dict[key]].reset_index(drop=True)
                         for j in range(3):
                             st.write('Result {}.'.format(j+1))

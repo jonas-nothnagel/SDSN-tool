@@ -13,6 +13,6 @@ app = MultiApp()
 app.add_app("About","house", info.app)
 app.add_app("SDG Analysis","gear",sdg_analysis.app)
 app.add_app("Search","search", keyword_search.app)
-app.add_app("NDC Coherence","exclude", coherence.app)
+app.add_app("NDC Comparison","exclude", coherence.app)
 
 app.run()
