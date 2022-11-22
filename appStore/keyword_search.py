@@ -26,6 +26,7 @@ max_seq_len = int(config.get('semantic_search','MAX_SEQ_LENGTH'))
 retriever_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
 reader_model = config.get('semantic_search','READER')
 reader_top_k = int(config.get('semantic_search','RETRIEVER_TOP_K'))
+top_k_per_candidate = int(config.get('semantic_search','READER_TOP_K_PER_CANDIDATE')) 
 lexical_split_by= config.get('lexical_search','SPLIT_BY')
 lexical_split_length=int(config.get('lexical_search','SPLIT_LENGTH'))
 lexical_split_overlap = int(config.get('lexical_search','SPLIT_OVERLAP'))
@@ -149,7 +150,8 @@ def app():
                             embedding_model_format=embedding_model_format,
                             reader_model=reader_model,reader_top_k=reader_top_k,
                             retriever_top_k=retriever_top_k, embedding_dim=embedding_dim,
-                            max_seq_len=max_seq_len)
+                            max_seq_len=max_seq_len,
+                            top_k_per_candidate = top_k_per_candidate)
 
                 else:
                     st.info("🤔 No document found, please try to upload it at the sidebar!")

@@ -245,7 +245,8 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
                 embedding_model_format:Text = None,embedding_layer:int = None,
                 embedding_dim:int = 768,retriever_top_k:int = 10,
                 reader_model:str =  None, reader_top_k:int = 10,
-                max_seq_len:int =512,useQueryCheck = True, ):
+                max_seq_len:int =512,useQueryCheck = True,
+                top_k_per_candidate:int = 1):
     """
     creates the semantic search pipeline and document Store object from the
     list of haystack documents. The top_k for the Reader and Retirever are kept  
@@ -290,7 +291,8 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
     max_seq_len:everymodel has max seq len it can handle, check in model card. 
             Needed to hanlde the edge cases
     useQueryCheck: Whether to use the querycheck which modifies the query or not.
-
+    top_k_per_candidate:How many answers to extract for each candidate doc 
+            that is coming from the retriever
 
     Return
     ---------
@@ -318,7 +320,8 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
     if useQueryCheck and reader_model:
         querycheck = QueryCheck()
         reader = FARMReader(model_name_or_path=reader_model,
-                    top_k = reader_top_k, use_gpu=True)
+                    top_k = reader_top_k, use_gpu=True,
+                    top_k_per_candidate = top_k_per_candidate)
         semantic_search_pipeline.add_node(component = querycheck, 
                     name = "QueryCheck",inputs = ["Query"])
         semantic_search_pipeline.add_node(component = retriever, 
@@ -328,7 +331,8 @@ def semanticSearchPipeline(documents:List[Document], embedding_model:Text =  Non
 
     elif reader_model :
         reader = FARMReader(model_name_or_path=reader_model,
-                    top_k = reader_top_k, use_gpu=True)
+                    top_k = reader_top_k, use_gpu=True,
+                    top_k_per_candidate = top_k_per_candidate)
         semantic_search_pipeline.add_node(component = retriever, 
                     name = "EmbeddingRetriever",inputs = ["Query"])
         semantic_search_pipeline.add_node(component = reader,
