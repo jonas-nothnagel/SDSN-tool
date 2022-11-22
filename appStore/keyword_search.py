@@ -72,6 +72,7 @@ def app():
             keywordexample = json.load(json_file)
         
         # genre = st.radio("Select Keyword Category", list(keywordexample.keys()))
+        st.caption("Select Keyword Category")
         genre = checkbox_without_preselect(list(keywordexample.keys()))
         if genre:
             keywordList = keywordexample[genre]
