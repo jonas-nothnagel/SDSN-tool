@@ -53,7 +53,8 @@ def app():
         st.write("")
         st.write(""" The application allows its user to perform a keyword search\
              based on two options: a lexical ([TFIDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf))\
-             search and semantic bi-encoder search. The difference between both \
+             search and semantic [bi-encoder](https://www.sbert.net/examples/applications/retrieve_rerank/README.html)\
+            search. The difference between both \
             approaches is quite straightforward; while the lexical search only \
             displays paragraphs in the document with exact matching results, \
             the semantic search shows paragraphs with meaningful connections \
@@ -62,9 +63,12 @@ def app():
             methods employ a probabilistic retrieval framework in its identification\
             of relevant paragraphs. By defualt the search is performed using \
             'Semantic Search', and to find 'Exact/Lexical Matches' please tick the \
-            checkbox provided, which will by-pass semantic search. Furthermore,\
+            checkbox provided which will by-pass semantic search. Furthermore,\
             the application allows the user to search for pre-defined keywords \
             from different thematic buckets present in sidebar.""")
+        st.write("")
+        st.write(""" The Exact Matches gives back top {} findings, and Semantic
+        search provides with top {} answers.""".format(lexical_top_k, retriever_top_k))
 
     
     with st.sidebar:
@@ -82,17 +86,22 @@ def app():
         st.markdown("---")
     
     with st.container():
-        # if keywordList is not None:
+        type_hinting = "Please enter here your question and we \
+                        will look for an answer in the document\
+                        OR enter the keyword you are looking \
+                        for and we will we will look for similar\
+                        context in the document. If dont have anything,\
+                        try the presets of keywords from sidebar. "
+        if keywordList is not None:
         #     queryList = st.text_input("You selected the {} category we \
-        #                 will look for these keywords in document".format(genre),
+        #                 will look for these keywords in document".format(genre)
         #                             value="{}".format(keywordList))
-        queryList = st.text_input("Please enter here your question and we \
-                                    will look for an answer in the document\
-                                    OR enter the keyword you are looking \
-                                    for and we will we will look for similar\
-                                    context in the document. If dont have anything\
-                                    try the presets of keywords from sidebar. ",
-                                    value = "{}".format(keywordList))
+            queryList = st.text_input(type_hinting,
+                                        value = "{}".format(keywordList))
+        else:
+             queryList = st.text_input(type_hinting,
+                                       placeholder="Enter keyword/query here")
+
         searchtype = st.checkbox("Show only Exact Matches")
         if st.button("Find them"):
 

@@ -450,7 +450,7 @@ def process_semantic_output(results):
     'reader_score','retriever_score','id',]. Distingushes if its single query or
     multi queries by reading the pipeline output dictionary keys.
     Uses the process_query_output to get the dataframe for each query and create
-    one concataneted dataframe. In case f Docs2Answers as final node, deletes 
+    one concataneted dataframe. In case of Docs2Answers as final node, deletes 
     the answers part. See documentations of process_query_output.
     
     Params
