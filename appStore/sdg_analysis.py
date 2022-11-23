@@ -84,19 +84,23 @@ def app():
         st.write("")
         st.write("")
         st.markdown("Some runtime metrics tested with cpu: Intel(R) Xeon(R) CPU @ 2.20GHz, memory: 13GB")
-        col1,col2,col3,col4 = st.columns([1,1,2,2])
+        col1,col2,col3,col4 = st.columns([2,2,3,3])
         with col1:
             st.caption("Loading Time Classifier")
-            st.write("12 sec")
+            st.markdown('<div style="text-align: center;">12 sec</div>', unsafe_allow_html=True)
+            # st.write("12 sec")
         with col2:
             st.caption("OCR File processing")
-            st.write("50 sec")
+            st.markdown('<div style="text-align: center;">50 sec</div>', unsafe_allow_html=True)
+            # st.write("50 sec")
         with col3:
             st.caption("SDG Classification of 200 paragraphs")
-            st.write("120 sec")
+            st.markdown('<div style="text-align: center;">120 sec</div>', unsafe_allow_html=True)
+            # st.write("120 sec")
         with col4:
             st.caption("Keyword extraction for 200 paragraphs")
-            st.write("3 sec")
+            st.markdown('<div style="text-align: center;">3 sec</div>', unsafe_allow_html=True)
+            # st.write("3 sec")
 
         
 
