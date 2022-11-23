@@ -87,20 +87,20 @@ def app():
         col1,col2,col3,col4 = st.columns([2,2,3,3])
         with col1:
             st.caption("Loading Time Classifier")
-            st.markdown('<div style="text-align: center;">12 sec</div>', unsafe_allow_html=True)
-            # st.write("12 sec")
+            # st.markdown('<div style="text-align: center;">12 sec</div>', unsafe_allow_html=True)
+            st.write("12 sec")
         with col2:
             st.caption("OCR File processing")
-            st.markdown('<div style="text-align: center;">50 sec</div>', unsafe_allow_html=True)
-            # st.write("50 sec")
+            # st.markdown('<div style="text-align: center;">50 sec</div>', unsafe_allow_html=True)
+            st.write("50 sec")
         with col3:
-            st.caption("SDG Classification of 200 paragraphs")
-            st.markdown('<div style="text-align: center;">120 sec</div>', unsafe_allow_html=True)
-            # st.write("120 sec")
+            st.caption("SDG Classification of 200 paragraphs(~ 35 pages)")
+            # st.markdown('<div style="text-align: center;">120 sec</div>', unsafe_allow_html=True)
+            st.write("120 sec")
         with col4:
-            st.caption("Keyword extraction for 200 paragraphs")
-            st.markdown('<div style="text-align: center;">3 sec</div>', unsafe_allow_html=True)
-            # st.write("3 sec")
+            st.caption("Keyword extraction for 200 paragraphs(~ 35 pages)")
+            # st.markdown('<div style="text-align: center;">3 sec</div>', unsafe_allow_html=True)
+            st.write("3 sec")
 
         
 

@@ -77,6 +77,17 @@ def app():
             investment needs). The assignment of the paragraph to a corresponding\
             indicator is based on vector similarities in which top 3 results
             if found are shown to the user. """)
+        st.write("")
+        col1,col2= st.columns(2)
+        with col1:
+            st.caption("OCR File processing")
+            # st.markdown('<div style="text-align: center;">50 sec</div>', unsafe_allow_html=True)
+            st.write("50 sec")
+           
+        with col2:
+            st.caption("NDC comparison on 200 paragraphs(~ 35 pages)")
+            # st.markdown('<div style="text-align: center;">12 sec</div>', unsafe_allow_html=True)
+            st.write("140 sec")
     
     with st.sidebar:
 

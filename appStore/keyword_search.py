@@ -70,8 +70,25 @@ def app():
         st.write("")
         st.write(""" The Exact Matches gives back top {} findings, and Semantic
         search provides with top {} answers.""".format(lexical_top_k, retriever_top_k))
-
-    
+        st.write("")
+        st.write("")
+        st.markdown("Some runtime metrics tested with cpu: Intel(R) Xeon(R) CPU @ 2.20GHz, memory: 13GB")
+        col1,col2,col3= st.columns([2,4,4])
+        with col1:
+            st.caption("OCR File processing")
+            # st.markdown('<div style="text-align: center;">50 sec</div>', unsafe_allow_html=True)
+            st.write("50 sec")
+           
+        with col2:
+            st.caption("Lexical Search on 200 paragraphs(~ 35 pages)")
+            # st.markdown('<div style="text-align: center;">12 sec</div>', unsafe_allow_html=True)
+            st.write("15 sec")
+           
+        with col3:
+            st.caption("Semantic search on 200 paragraphs(~ 35 pages)")
+            # st.markdown('<div style="text-align: center;">120 sec</div>', unsafe_allow_html=True)
+            st.write("120 sec(excluding emebedding creation)")
+ 
     with st.sidebar:
         with open('docStore/sample/keywordexample.json','r') as json_file:
             keywordexample = json.load(json_file)
