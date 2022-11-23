@@ -84,7 +84,7 @@ def app():
         st.write("")
         st.write("")
         st.markdown("Some runtime metrics tested with cpu: Intel(R) Xeon(R) CPU @ 2.20GHz, memory: 13GB")
-        col1,col2,col3,col4 = st.columns(4)
+        col1,col2,col3,col4 = st.columns([1,1,2,2])
         with col1:
             st.caption("Loading Time Classifier")
             st.write("12 sec")
