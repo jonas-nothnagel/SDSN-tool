@@ -81,7 +81,24 @@ def app():
             which is an easy-to-use computational less expensive \
             model leveraging combination of TFIDF and Graph networks.
             """)
-        st.markdown("")
+        st.write("")
+        st.write("")
+        st.markdown("Some runtime metrics tested with cpu: Intel(R) Xeon(R) CPU @ 2.20GHz, memory: 13GB")
+        col1,col2,col3,col4 = st.columns(4)
+        with col1:
+            st.caption("Loading Time Classifier")
+            st.write("12 sec")
+        with col2:
+            st.caption("OCR File processing")
+            st.write("50 sec")
+        with col3:
+            st.caption("SDG Classification of 200 paragraphs")
+            st.write("120 sec")
+        with col4:
+            st.caption("Keyword extraction for 200 paragraphs")
+            st.write("3 sec")
+
+        
 
     
     ### Main app code ###
