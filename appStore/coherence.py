@@ -78,6 +78,8 @@ def app():
             indicator is based on vector similarities in which top 3 results
             if found are shown to the user. """)
         st.write("")
+        st.write("")
+        st.markdown("Some runtime metrics tested with cpu: Intel(R) Xeon(R) CPU @ 2.20GHz, memory: 13GB")
         col1,col2= st.columns(2)
         with col1:
             st.caption("OCR File processing")
