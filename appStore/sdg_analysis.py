@@ -84,7 +84,7 @@ def app():
         st.write("")
         st.write("")
         st.markdown("Some runtime metrics tested with cpu: Intel(R) Xeon(R) CPU @ 2.20GHz, memory: 13GB")
-        col1,col2,col3,col4 = st.columns([2,2,3,3])
+        col1,col2,col3,col4 = st.columns([2,2,4,4])
         with col1:
             st.caption("Loading Time Classifier")
             # st.markdown('<div style="text-align: center;">12 sec</div>', unsafe_allow_html=True)

@@ -87,7 +87,7 @@ def app():
         with col3:
             st.caption("Semantic search on 200 paragraphs(~ 35 pages)")
             # st.markdown('<div style="text-align: center;">120 sec</div>', unsafe_allow_html=True)
-            st.write("120 sec(excluding emebedding creation)")
+            st.write("120 sec(including emebedding creation)")
  
     with st.sidebar:
         with open('docStore/sample/keywordexample.json','r') as json_file:
