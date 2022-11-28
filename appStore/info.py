@@ -83,4 +83,4 @@ def app():
     <br>
     """
     st.markdown(intro, unsafe_allow_html=True)
-    st.image("docStore/img/pic1.png")
+    st.image("docStore/img/paris.png")
