@@ -7,7 +7,7 @@ def app():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
     st.markdown("<h2 style='text-align: center;  \
-                      color: black;'> Climate Policy Action Tracker Manual</h2>", 
+                      color: black;'> Policy Action Tracker Manual</h2>", 
                       unsafe_allow_html=True)
 
     
@@ -83,4 +83,4 @@ def app():
     <br>
     """
     st.markdown(intro, unsafe_allow_html=True)
-    st.image("docStore/img/paris.png")
+    # st.image("docStore/img/paris.png")
