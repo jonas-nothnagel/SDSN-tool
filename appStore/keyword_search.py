@@ -46,21 +46,18 @@ def app():
 
         st.write(
             """     
-            The *Keyword Search* app is an easy-to-use interface \
-            built in Streamlit for doing keyword search in \
-            policy document - developed by GIZ Data and the \
-            Sustainable Development Solution Network.
+            The *Search* app is an interface \
+            for doing contextual and keyword searches in \
+            policy documents.  \
             """)
         st.write("")
-        st.write(""" The application allows its user to perform a keyword search\
-             based on two options: a lexical ([TFIDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf))\
-             search and semantic [bi-encoder](https://www.sbert.net/examples/applications/retrieve_rerank/README.html)\
-            search. The difference between both \
-            approaches is quite straightforward; while the lexical search only \
+        st.write(""" The application allows its user to perform a search\
+             based on two options: a lexical search([TFIDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf))\
+              and semantic search. [bi-encoder](https://www.sbert.net/examples/applications/retrieve_rerank/README.html)\
+             The lexical search only \
             displays paragraphs in the document with exact matching results, \
             the semantic search shows paragraphs with meaningful connections \
-            (e.g., synonyms) based on the context as well. The semantic search \
-            allows for a personalized experience in using the application. Both \
+            (e.g., synonyms) based on the search context. Both \
             methods employ a probabilistic retrieval framework in its identification\
             of relevant paragraphs. By defualt the search is performed using \
             'Semantic Search', and to find 'Exact/Lexical Matches' please tick the \
@@ -107,9 +104,9 @@ def app():
         type_hinting = "Please enter here your question and we \
                         will look for an answer in the document\
                         OR enter the keyword you are looking \
-                        for and we will we will look for similar\
-                        context in the document. If dont have anything,\
-                        try the presets of keywords from sidebar. "
+                        for and we will look for similar\
+                        context in the document.\
+                        You can also explore predefined sets of keywords from sidebar. "
         if keywordList is not None:
         #     queryList = st.text_input("You selected the {} category we \
         #                 will look for these keywords in document".format(genre)
