@@ -5,14 +5,14 @@ import appStore.info as info
 from appStore.multiapp import MultiApp
 import streamlit as st
 
-st.set_page_config(page_title = 'SDSN x GIZ Policy Action Tracking v0.2', 
+st.set_page_config(page_title = 'Climate Policy Intelligence', 
                    initial_sidebar_state='expanded', layout="wide") 
 
 app = MultiApp()
 
 app.add_app("About","house", info.app)
-app.add_app("SDG Analysis","gear",sdg_analysis.app)
 app.add_app("Search","search", keyword_search.app)
+app.add_app("SDG Analysis","gear",sdg_analysis.app)
 app.add_app("NDC Comparison","exclude", coherence.app)
 
 app.run()
