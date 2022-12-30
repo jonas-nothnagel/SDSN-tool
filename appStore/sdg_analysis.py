@@ -57,10 +57,9 @@ def app():
             can breach and hence this limit of 120 is tentative.  \n
             """)
         st.write("""**SDG cLassification:** The application assigns paragraphs \
-            to 15 of the 17 United Nations Sustainable Development Goals (SDGs).\
-            SDG 16 “Peace, Justice and Strong Institutions” and SDG 17 \
-            “Partnerships for the Goals” are excluded from the analysis due to \
-            their broad nature which could potentially inflate the results. \
+            to 16 of the 17 United Nations Sustainable Development Goals (SDGs).\
+            SDG 17 “Partnerships for the Goals” is excluded from the analysis due \
+            to its broad nature which could potentially inflate the results. \
             Each paragraph is assigned to one SDG only. Again, the results are \
             displayed in a summary table including the number of the SDG, a \
             relevancy score highlighted through a green color shading, and the \
