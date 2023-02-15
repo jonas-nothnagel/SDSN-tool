@@ -16,3 +16,4 @@ summa==1.2.0
 streamlit-aggrid
 python-docx
 streamlit_option_menu
+sentence-transformers
